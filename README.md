@@ -1,4 +1,4 @@
-# spigot-command-api
+# MC Command Framework
 
 ### DISCLAIMER:
 
@@ -6,8 +6,13 @@ I did not make nor helped in the initial development of this project. All the cr
 
 What I'll actually do is maintain this plugin updated and according to my needs, while keeping it public, as far as providing builds on my Maven repository (check below).
 
-To keep my Java packages ordered, I'll probably rename the packages to me.marioogg.*, although this message will stay here because my intention will never be skidding other ones code. If you have any kind of proposal to add a feature, open a [pull request](https://github.com/marioogg/spigot-command-api/pulls) or an [issue](https://github.com/marioogg/spigot-command-api/issues)
+To keep my Java packages ordered, ~~I'll probably rename the packages to me.marioogg.*~~ (already in process.), although this message will stay here because my intention will never be skidding other ones code. If you have any kind of proposal to add a feature, open a [pull request](https://github.com/marioogg/command/pulls) or an [issue](https://github.com/marioogg/command/issues)
 
+
+## To do
+- [x] Write the press release
+- [ ] Update the website
+- [ ] Contact the media
 
 ### Features
 * Creates usage messages for you
@@ -25,6 +30,8 @@ You can also create custom processors which there is an example of at the bottom
 * **Misc:** World, Boolean, Duration, ChatColor, Gamemode
 
 ### Maven & Gradle Implementation
+![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmaven.marioogg.dev%2Fservice%2Frest%2Fv1%2Fsearch%3Frepository%3Dpublic%26group%3Dme.gleeming.command%26name%3Dspigot-command-api%26sort%3Dversion%26direction%3Ddesc&query=$.items[0].version&label=Nexus&color=0A66C2&style=for-the-badge)
+
 **Maven:** In your *pom.xml* file, add the repository and the dependency.
 ```xml
 <repositories>
@@ -36,8 +43,8 @@ You can also create custom processors which there is an example of at the bottom
 
 <dependencies>
     <dependency>
-        <groupId>me.gleeming.command</groupId>
-        <artifactId>spigot-command-api</artifactId>
+        <groupId>me.marioogg.command</groupId>
+        <artifactId>command</artifactId>
         <version>1.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
