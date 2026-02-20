@@ -21,7 +21,12 @@ publishing {
 
     repositories {
         maven {
-            url "https://maven.marioogg.dev/repository/snapshots"
+            def isSnapshot = version.toString().endsWith("SNAPSHOT")
+            def releasesRepoUrl = "https://maven.marioogg.dev/repository/releases"
+            def snapshotsRepoUrl = "https://maven.marioogg.dev/repository/snapshots"
+
+            url = uri(isSnapshot ? snapshotsRepoUrl : releasesRepoUrl)
+
             credentials {
                 username = System.getenv("MAVEN_USERNAME")
                 password = System.getenv("MAVEN_PASSWORD")
