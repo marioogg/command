@@ -5,13 +5,11 @@ plugins {
     id 'com.gradleup.shadow' version '8.3.3'
 }
 
-group 'me.gleeming.command'
-version '1.0-SNAPSHOT'
+group 'me.marioogg'
+version '1.0'
 
 repositories {
-    mavenCentral()
-    maven { url 'https://jitpack.io/' }
-    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://maven.marioogg.dev/repository/public' }
 }
 
 publishing {

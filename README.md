@@ -6,13 +6,13 @@ I did not make nor helped in the initial development of this project. All the cr
 
 What I'll actually do is maintain this plugin updated and according to my needs, while keeping it public, as far as providing builds on my Maven repository (check below).
 
-To keep my Java packages ordered, ~~I'll probably rename the packages to me.marioogg.*~~ (already in process.), although this message will stay here because my intention will never be skidding other ones code. If you have any kind of proposal to add a feature, open a [pull request](https://github.com/marioogg/command/pulls) or an [issue](https://github.com/marioogg/command/issues)
+To keep my Java packages ordered, I'll probably rename the packages to `me.marioogg.*` (already in process), although this message will stay here because my intention will never be skidding other ones code. If you have any kind of proposal to add a feature, open a [pull request](https://github.com/marioogg/command/pulls) or an [issue](https://github.com/marioogg/command/issues)
 
 
 ## To do
-- [x] Write the press release
-- [ ] Update the website
-- [ ] Contact the media
+- [] Add Folia Support
+- [] Add Bungeecord Support
+- [] Add Velocity Support
 
 ### Features
 * Creates usage messages for you
@@ -22,6 +22,11 @@ To keep my Java packages ordered, ~~I'll probably rename the packages to me.mari
 * Makes it easier than ever to create commands
 * Automatic tab completion
 * Tab completion for your custom objects via processors
+
+> **NOTE:** <br>
+> It's recommended to relocate the library,
+> to avoid version conflicts with other plugins that use the framework.
+
 ### Parsing
 At the moment, this command api will parse the following values for you.\
 You can also create custom processors which there is an example of at the bottom of this page.
@@ -33,6 +38,7 @@ You can also create custom processors which there is an example of at the bottom
 ![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmaven.marioogg.dev%2Fservice%2Frest%2Fv1%2Fsearch%3Frepository%3Dpublic%26group%3Dme.gleeming.command%26name%3Dspigot-command-api%26sort%3Dversion%26direction%3Ddesc&query=$.items[0].version&label=Nexus&color=0A66C2&style=for-the-badge)
 
 **Maven:** In your *pom.xml* file, add the repository and the dependency.
+> **Important:** Replace `VERSION` with the latest available version (see Nexus badge above).
 ```xml
 <repositories>
     <repository>
@@ -43,14 +49,15 @@ You can also create custom processors which there is an example of at the bottom
 
 <dependencies>
     <dependency>
-        <groupId>me.marioogg.command</groupId>
+        <groupId>me.marioogg</groupId>
         <artifactId>command</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>VERSION</version>
     </dependency>
 </dependencies>
 ```
 
 **Gradle:** In your *build.gradle* file, add the repository and the dependency.
+> **Important:** Replace `VERSION` with the latest available version (see the Nexus badge above).
 ```groovy
 repositories {
     maven {
@@ -59,7 +66,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'me.gleeming.command:spigot-command-api:1.0-SNAPSHOT'
+    implementation 'me.gleeming.command:command:VERSION'
 }
 ```
 
