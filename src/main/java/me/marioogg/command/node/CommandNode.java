@@ -111,15 +111,15 @@ public class CommandNode {
                     return;
                 }
 
-                if(this.parameters.size() > 0) {
-                    ArgumentNode lastArgument = this.parameters.get(this.parameters.size() - 1);
+                if(!this.parameters.isEmpty()) {
+                    ArgumentNode lastArgument = this.parameters.getLast();
                     if (lastArgument.isConcated() && actualLength > requiredParameters) {
                         probability.addAndGet(125);
                         return;
                     }
                 }
 
-                if(!tabbed || splitName.length > 1 || parameters.size() > 0)
+                if(!tabbed || splitName.length > 1 || !parameters.isEmpty())
                     probability.addAndGet(50);
 
                 if(actualLength > requiredParameters)
@@ -131,7 +131,7 @@ public class CommandNode {
                 if(!(sender instanceof Player) && playerOnly)
                     probability.addAndGet(-15);
 
-                if(!permission.equals("") && !sender.hasPermission(permission))
+                if(!permission.isEmpty() && !sender.hasPermission(permission))
                     probability.addAndGet(-15);
 
                 return;
@@ -160,12 +160,12 @@ public class CommandNode {
             return;
         }
 
-        if(!permission.equals("") && !sender.hasPermission(permission)) {
+        if(!permission.isEmpty() && !sender.hasPermission(permission)) {
             sender.sendMessage(ChatColor.RED + "I'm sorry, you do not have permission to execute this command.");
             return;
         }
 
-        StringBuilder builder = new StringBuilder(ChatColor.RED + "Usage: /" + names.get(0) + " ");
+        StringBuilder builder = new StringBuilder(ChatColor.RED + "Usage: /" + names.getFirst() + " ");
         parameters.forEach(param -> {
             if(param.isRequired()) builder.append("<").append(param.getName()).append(param.isConcated() ? ".." : "").append(">");
             else builder.append("[").append(param.getName()).append(param.isConcated() ? ".." : "").append("]");
@@ -181,7 +181,7 @@ public class CommandNode {
      * @return Required Length
      */
     public int requiredArgumentsLength() {
-        int requiredArgumentsLength = names.get(0).split(" ").length - 1;
+        int requiredArgumentsLength = names.getFirst().split(" ").length - 1;
         for(ArgumentNode node : parameters) if(node.isRequired()) requiredArgumentsLength++;
         return requiredArgumentsLength;
     }
@@ -195,7 +195,7 @@ public class CommandNode {
     @SneakyThrows
     public void execute(CommandSender sender, String[] args) {
         // Checks if the player has permission
-        if(!permission.equals("") && !sender.hasPermission(permission)) {
+        if(!permission.isEmpty() && !sender.hasPermission(permission)) {
             sender.sendMessage(ChatColor.RED + "I'm sorry, although you do not have permission to execute this command.");
             return;
         }
@@ -213,7 +213,7 @@ public class CommandNode {
         }
 
         // Calculates the amount of arguments in the name
-        int nameArgs = (names.get(0).split(" ").length - 1);
+        int nameArgs = (names.getFirst().split(" ").length - 1);
 
         List<Object> objects = new ArrayList<>(Collections.singletonList(sender));
         for(int i = 0; i < args.length - nameArgs; i++) {

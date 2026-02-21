@@ -87,15 +87,15 @@ public class VelocityCommandNode {
                     return;
                 }
 
-                if (this.parameters.size() > 0) {
-                    ArgumentNode lastArgument = this.parameters.get(this.parameters.size() - 1);
+                if (!this.parameters.isEmpty()) {
+                    ArgumentNode lastArgument = this.parameters.getLast();
                     if (lastArgument.isConcated() && actualLength > requiredParameters) {
                         probability.addAndGet(125);
                         return;
                     }
                 }
 
-                if (!tabbed || splitName.length > 1 || parameters.size() > 0)
+                if (!tabbed || splitName.length > 1 || !parameters.isEmpty())
                     probability.addAndGet(50);
 
                 if (actualLength > requiredParameters)
@@ -107,7 +107,7 @@ public class VelocityCommandNode {
                 if (!(source instanceof Player) && playerOnly)
                     probability.addAndGet(-15);
 
-                if (!permission.equals("") && !source.hasPermission(permission))
+                if (!permission.isEmpty() && !source.hasPermission(permission))
                     probability.addAndGet(-15);
 
                 return;
@@ -133,12 +133,12 @@ public class VelocityCommandNode {
             return;
         }
 
-        if (!permission.equals("") && !source.hasPermission(permission)) {
+        if (!permission.isEmpty() && !source.hasPermission(permission)) {
             source.sendMessage(Component.text("I'm sorry, you do not have permission to execute this command.", NamedTextColor.RED));
             return;
         }
 
-        StringBuilder builder = new StringBuilder("Usage: /" + names.get(0) + " ");
+        StringBuilder builder = new StringBuilder("Usage: /" + names.getFirst() + " ");
         parameters.forEach(param -> {
             if (param.isRequired()) builder.append("<").append(param.getName()).append(param.isConcated() ? ".." : "").append(">");
             else builder.append("[").append(param.getName()).append(param.isConcated() ? ".." : "").append("]");
@@ -149,14 +149,14 @@ public class VelocityCommandNode {
     }
 
     public int requiredArgumentsLength() {
-        int requiredArgumentsLength = names.get(0).split(" ").length - 1;
+        int requiredArgumentsLength = names.getFirst().split(" ").length - 1;
         for (ArgumentNode node : parameters) if (node.isRequired()) requiredArgumentsLength++;
         return requiredArgumentsLength;
     }
 
     @SneakyThrows
     public void execute(CommandSource source, String[] args) {
-        if (!permission.equals("") && !source.hasPermission(permission)) {
+        if (!permission.isEmpty() && !source.hasPermission(permission)) {
             source.sendMessage(Component.text("I'm sorry, although you do not have permission to execute this command.", NamedTextColor.RED));
             return;
         }
@@ -171,7 +171,7 @@ public class VelocityCommandNode {
             return;
         }
 
-        int nameArgs = (names.get(0).split(" ").length - 1);
+        int nameArgs = (names.getFirst().split(" ").length - 1);
 
         List<Object> objects = new ArrayList<>(Collections.singletonList(source));
         for (int i = 0; i < args.length - nameArgs; i++) {

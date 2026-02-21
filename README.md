@@ -39,7 +39,7 @@ You can also register custom processors for any type — see the processor examp
 <repositories>
     <repository>
         <id>marioogg</id>
-        <url>https://maven.marioogg.dev/repository/public/\</url\>
+        <url>https://maven.marioogg.dev/repository/public/</url>
     </repository>
 </repositories>
 <dependencies>
