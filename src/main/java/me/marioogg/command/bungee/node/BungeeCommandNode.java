@@ -1,6 +1,5 @@
 package me.marioogg.command.bungee.node;
 
-import com.avaje.ebean.LogLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.marioogg.command.Command;
@@ -14,13 +13,10 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 
 @Getter
 public class BungeeCommandNode {
@@ -39,9 +35,6 @@ public class BungeeCommandNode {
 
     private final List<ArgumentNode> parameters = new ArrayList<>();
     private final List<HelpNode> helpNodes = new ArrayList<>();
-
-    private static final Logger log = LogManager.getLogger();
-
 
     public BungeeCommandNode(Object parentClass, Method method, Command command) {
         Arrays.stream(command.names()).forEach(name -> names.add(name.toLowerCase()));
@@ -95,7 +88,7 @@ public class BungeeCommandNode {
                 }
 
                 if (!this.parameters.isEmpty()) {
-                    ArgumentNode lastArgument = this.parameters.getLast();
+                    ArgumentNode lastArgument = this.parameters.get(this.parameters.size() - 1);
                     if (lastArgument.isConcated() && actualLength > requiredParameters) {
                         probability.addAndGet(125);
                         return;
@@ -145,7 +138,7 @@ public class BungeeCommandNode {
             return;
         }
 
-        StringBuilder builder = new StringBuilder(ChatColor.RED + "Usage: /" + names.getFirst() + " ");
+        StringBuilder builder = new StringBuilder(ChatColor.RED + "Usage: /" + names.get(0) + " ");
         parameters.forEach(param -> {
             if (param.isRequired()) builder.append("<").append(param.getName()).append(param.isConcated() ? ".." : "").append(">");
             else builder.append("[").append(param.getName()).append(param.isConcated() ? ".." : "").append("]");
@@ -156,7 +149,7 @@ public class BungeeCommandNode {
     }
 
     public int requiredArgumentsLength() {
-        int requiredArgumentsLength = names.getFirst().split(" ").length - 1;
+        int requiredArgumentsLength = names.get(0).split(" ").length - 1;
         for (ArgumentNode node : parameters) if (node.isRequired()) requiredArgumentsLength++;
         return requiredArgumentsLength;
     }
@@ -178,7 +171,7 @@ public class BungeeCommandNode {
             return;
         }
 
-        int nameArgs = (names.getFirst().split(" ").length - 1);
+        int nameArgs = (names.get(0).split(" ").length - 1);
 
         List<Object> objects = new ArrayList<>(Collections.singletonList(sender));
         for (int i = 0; i < args.length - nameArgs; i++) {
@@ -222,7 +215,7 @@ public class BungeeCommandNode {
         if (async) {
             final List<Object> asyncObjects = objects;
             BungeeCommandHandler.getPlugin().getProxy().getScheduler().runAsync(BungeeCommandHandler.getPlugin(), () -> {
-                try { method.invoke(parentClass, asyncObjects.toArray()); } catch (Exception e) { log.error(e); }
+                try { method.invoke(parentClass, asyncObjects.toArray()); } catch (Exception e) { e.printStackTrace(); }
             });
             return;
         }
@@ -230,4 +223,3 @@ public class BungeeCommandNode {
         method.invoke(parentClass, objects.toArray());
     }
 }
-

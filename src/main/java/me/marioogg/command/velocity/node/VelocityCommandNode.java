@@ -13,8 +13,6 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -37,8 +35,6 @@ public class VelocityCommandNode {
 
     private final List<ArgumentNode> parameters = new ArrayList<>();
     private final List<HelpNode> helpNodes = new ArrayList<>();
-
-    private static final Logger log = LogManager.getLogger();
 
     public VelocityCommandNode(Object parentClass, Method method, Command command) {
         Arrays.stream(command.names()).forEach(name -> names.add(name.toLowerCase()));
@@ -92,7 +88,7 @@ public class VelocityCommandNode {
                 }
 
                 if (!this.parameters.isEmpty()) {
-                    ArgumentNode lastArgument = this.parameters.getLast();
+                    ArgumentNode lastArgument = this.parameters.get(this.parameters.size() - 1);
                     if (lastArgument.isConcated() && actualLength > requiredParameters) {
                         probability.addAndGet(125);
                         return;
@@ -142,7 +138,7 @@ public class VelocityCommandNode {
             return;
         }
 
-        StringBuilder builder = new StringBuilder("Usage: /" + names.getFirst() + " ");
+        StringBuilder builder = new StringBuilder("Usage: /" + names.get(0) + " ");
         parameters.forEach(param -> {
             if (param.isRequired()) builder.append("<").append(param.getName()).append(param.isConcated() ? ".." : "").append(">");
             else builder.append("[").append(param.getName()).append(param.isConcated() ? ".." : "").append("]");
@@ -153,7 +149,7 @@ public class VelocityCommandNode {
     }
 
     public int requiredArgumentsLength() {
-        int requiredArgumentsLength = names.getFirst().split(" ").length - 1;
+        int requiredArgumentsLength = names.get(0).split(" ").length - 1;
         for (ArgumentNode node : parameters) if (node.isRequired()) requiredArgumentsLength++;
         return requiredArgumentsLength;
     }
@@ -175,7 +171,7 @@ public class VelocityCommandNode {
             return;
         }
 
-        int nameArgs = (names.getFirst().split(" ").length - 1);
+        int nameArgs = (names.get(0).split(" ").length - 1);
 
         List<Object> objects = new ArrayList<>(Collections.singletonList(source));
         for (int i = 0; i < args.length - nameArgs; i++) {
@@ -220,7 +216,7 @@ public class VelocityCommandNode {
             final List<Object> asyncObjects = objects;
             VelocityCommandHandler.getProxy().getScheduler()
                     .buildTask(VelocityCommandHandler.getPlugin(), () -> {
-                        try { method.invoke(parentClass, asyncObjects.toArray()); } catch (Exception e) { log.error(e); }
+                        try { method.invoke(parentClass, asyncObjects.toArray()); } catch (Exception e) { e.printStackTrace(); }
                     }).schedule();
             return;
         }

@@ -116,7 +116,7 @@ public class CommandNode {
                 }
 
                 if(!this.parameters.isEmpty()) {
-                    ArgumentNode lastArgument = this.parameters.getLast();
+                    ArgumentNode lastArgument = this.parameters.get(this.parameters.size() - 1);
                     if (lastArgument.isConcated() && actualLength > requiredParameters) {
                         probability.addAndGet(125);
                         return;
@@ -169,7 +169,7 @@ public class CommandNode {
             return;
         }
 
-        StringBuilder builder = new StringBuilder(ChatColor.RED + "Usage: /" + names.getFirst() + " ");
+        StringBuilder builder = new StringBuilder(ChatColor.RED + "Usage: /" + names.get(0) + " ");
         parameters.forEach(param -> {
             if(param.isRequired()) builder.append("<").append(param.getName()).append(param.isConcated() ? ".." : "").append(">");
             else builder.append("[").append(param.getName()).append(param.isConcated() ? ".." : "").append("]");
@@ -185,7 +185,7 @@ public class CommandNode {
      * @return Required Length
      */
     public int requiredArgumentsLength() {
-        int requiredArgumentsLength = names.getFirst().split(" ").length - 1;
+        int requiredArgumentsLength = names.get(0).split(" ").length - 1;
         for(ArgumentNode node : parameters) if(node.isRequired()) requiredArgumentsLength++;
         return requiredArgumentsLength;
     }
@@ -217,7 +217,7 @@ public class CommandNode {
         }
 
         // Calculates the amount of arguments in the name
-        int nameArgs = (names.getFirst().split(" ").length - 1);
+        int nameArgs = (names.get(0).split(" ").length - 1);
 
         List<Object> objects = new ArrayList<>(Collections.singletonList(sender));
         for(int i = 0; i < args.length - nameArgs; i++) {
