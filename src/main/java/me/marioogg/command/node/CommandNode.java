@@ -8,7 +8,7 @@ import me.marioogg.command.bukkit.BukkitCommand;
 import me.marioogg.command.help.HelpNode;
 import me.marioogg.command.parameter.Param;
 import me.marioogg.command.parameter.ParamProcessor;
-import org.bukkit.Bukkit;
+import me.marioogg.command.scheduler.SchedulerUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -257,8 +257,9 @@ public class CommandNode {
         }
 
         if(async) {
-            Bukkit.getScheduler().runTaskAsynchronously(CommandHandler.getPlugin(), () -> {
-                try { method.invoke(parentClass, objects.toArray()); } catch(Exception exception) { exception.printStackTrace(); }
+            final List<Object> asyncObjects = objects;
+            SchedulerUtil.runAsync(() -> {
+                try { method.invoke(parentClass, asyncObjects.toArray()); } catch(Exception exception) { exception.printStackTrace(); }
             });
             return;
         }

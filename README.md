@@ -10,7 +10,7 @@ To keep my Java packages ordered, I'll probably rename the packages to `me.mario
 
 
 ## To do
-- [] Add Folia Support
+- [x] Add Folia Support
 - [] Add Bungeecord Support
 - [] Add Velocity Support
 
