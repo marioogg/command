@@ -7,6 +7,7 @@ To keep my Java packages ordered, I'll probably rename the packages to `me.mario
 - [x] Add Folia Support
 - [x] Add BungeeCord Support
 - [x] Add Velocity Support
+- [ ] Adding a proper wiki instead of dropping everything on here
 ### Features
 * Creates usage messages for you
 * Automatically parses parameters
