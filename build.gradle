@@ -9,7 +9,8 @@ group 'me.marioogg'
 version '1.0-SNAPSHOT'
 
 repositories {
-    maven { url 'https://maven.marioogg.dev/repository/public' }
+    maven { url 'https://maven.marioogg.dev/repository/public/' }
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
 }
 
 publishing {
@@ -39,9 +40,12 @@ dependencies {
     compileOnly('org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT') {
         exclude group: 'net.md-5'
     }
-    compileOnly('dev.folia:folia-api:1.20.4-R0.1-SNAPSHOT') {
+    compileOnly('dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT') {
         exclude group: 'net.md-5'
     }
+    compileOnly 'net.md-5:bungeecord-api:1.20-R0.2-SNAPSHOT'
+    compileOnly 'com.velocitypowered:velocity-api:3.3.0-SNAPSHOT'
+
 }
 
 tasks.withType(JavaCompile) {
