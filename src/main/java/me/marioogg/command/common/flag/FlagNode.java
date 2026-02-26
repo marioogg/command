@@ -21,6 +21,7 @@ public class FlagNode {
     /** readable description. */
     private final String description;
 
+
     /** The underlying reflection param */
     private final Parameter parameter;
 

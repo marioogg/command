@@ -38,5 +38,7 @@ public @interface Flag {
      * human-readable description shown in usage/help messages.
      */
     String description() default "";
+
+    boolean defaultValue() default true;
 }
 
