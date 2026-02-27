@@ -22,5 +22,5 @@ Also, documentation has been moved to [the wiki.](https://github.com/marioogg/co
 * **Misc:** Boolean
 * **Numbers:** Integer, Long, Double, Float
 * **Misc:** Boolean
-You can also register custom processors for any type — see the processor examples [in the wiki.](https://github.com/marioogg/command/wiki).
+You can also register custom processors for any type — see the processor examples [in the wiki.](https://github.com/marioogg/command/wiki)
 ---
