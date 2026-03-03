@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import me.marioogg.command.Command;
 import me.marioogg.command.bungee.BungeeCommandHandler;
-import me.marioogg.command.bungee.bukkit.BungeeRawCommand;
+import me.marioogg.command.bungee.bukkit.BungeeCommand;
 import me.marioogg.command.bungee.parameter.BungeeParamProcessor;
 import me.marioogg.command.common.flag.Flag;
 import me.marioogg.command.common.flag.FlagNode;
@@ -65,8 +65,8 @@ public class BungeeCommandNode {
         });
 
         names.forEach(name -> {
-            if (!BungeeRawCommand.getCommands().containsKey(name.split(" ")[0].toLowerCase()))
-                new BungeeRawCommand(name.split(" ")[0].toLowerCase());
+            if (!BungeeCommand.getCommands().containsKey(name.split(" ")[0].toLowerCase()))
+                new BungeeCommand(name.split(" ")[0].toLowerCase());
         });
 
         List<String> toAdd = new ArrayList<>();

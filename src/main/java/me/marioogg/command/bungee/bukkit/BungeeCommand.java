@@ -16,10 +16,10 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class BungeeRawCommand extends Command implements TabExecutor {
-    @Getter private static final HashMap<String, BungeeRawCommand> commands = new HashMap<>();
+public class BungeeCommand extends Command implements TabExecutor {
+    @Getter private static final HashMap<String, BungeeCommand> commands = new HashMap<>();
 
-    public BungeeRawCommand(String root) {
+    public BungeeCommand(String root) {
         super(root);
         commands.put(root.toLowerCase(), this);
         me.marioogg.command.bungee.BungeeCommandHandler.getPlugin().getProxy().getPluginManager().registerCommand(

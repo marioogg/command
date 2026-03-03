@@ -40,7 +40,9 @@ public @interface Flag {
     String description() default "";
 
 
-
+    /**
+     * Default return value of a flag if not present in the command
+     */
     boolean defaultValue() default true;
 }
 
