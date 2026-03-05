@@ -19,11 +19,15 @@ public class VelocityCommandHandler {
     @Getter @Setter private static Object plugin;
     @Getter @Setter private static ProxyServer proxy;
 
-    private static final Logger logger = LoggerFactory.getLogger(VelocityCommandHandler.class);
+    private static Logger logger;
 
     public static void init(Object plugin, ProxyServer proxy) {
         VelocityCommandHandler.plugin = plugin;
         VelocityCommandHandler.proxy = proxy;
+        String pluginName = proxy.getPluginManager().fromInstance(plugin)
+                .map(container -> container.getDescription().getId())
+                .orElse(plugin.getClass().getSimpleName()); //backup because in some old versions it breaks
+        VelocityCommandHandler.logger = LoggerFactory.getLogger(pluginName);
     }
 
     @SneakyThrows
@@ -48,7 +52,7 @@ public class VelocityCommandHandler {
         }
     }
 
-    public static void registerCommands(Object commandClass) {
+    private static void registerCommands(Object commandClass) {
         Arrays.stream(commandClass.getClass().getDeclaredMethods()).forEach(method -> {
             me.marioogg.command.Command command = method.getAnnotation(me.marioogg.command.Command.class);
             if (command == null) return;

@@ -13,9 +13,13 @@ import me.marioogg.command.bukkit.node.ArgumentNode;
 import me.marioogg.command.bukkit.parameter.Param;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.slf4j.Logger;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,6 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Getter
 public class BungeeCommandNode {
     @Getter private static final List<BungeeCommandNode> nodes = new ArrayList<>();
+
+    private static final Logger log = BungeeCommandHandler.getLogger();
 
     private final ArrayList<String> names = new ArrayList<>();
     private final String permission;
@@ -262,8 +268,17 @@ public class BungeeCommandNode {
         if (async) {
             final List<Object> asyncObjects = objects;
             BungeeCommandHandler.getPlugin().getProxy().getScheduler().runAsync(BungeeCommandHandler.getPlugin(), () -> {
-                try { method.invoke(parentClass, asyncObjects.toArray()); } catch (Exception e) { e.printStackTrace(); }
-            });
+                try {
+                    method.invoke(parentClass, asyncObjects.toArray());
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
+                    log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), sender.getName(), cause);
+                    sender.sendMessage(new ComponentBuilder(
+                            "An internal error occurred while executing this command.")
+                            .color(ChatColor.RED)
+                            .bold(true)
+                            .create());
+            }});
             return;
         }
 

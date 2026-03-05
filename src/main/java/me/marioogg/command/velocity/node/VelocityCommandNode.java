@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Getter
-public class VelocityCommandNode {
+public class VelocityCommandNode{
     @Getter private static final List<VelocityCommandNode> nodes = new ArrayList<>();
 
     private final ArrayList<String> names = new ArrayList<>();

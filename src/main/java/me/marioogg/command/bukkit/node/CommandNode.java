@@ -1,7 +1,6 @@
 package me.marioogg.command.bukkit.node;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.marioogg.command.Command;
 import me.marioogg.command.bukkit.BukkitCommandHandler;
 import me.marioogg.command.bukkit.BukkitCommand;
@@ -11,15 +10,14 @@ import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.bukkit.parameter.Param;
 import me.marioogg.command.bukkit.parameter.ParamProcessor;
 import me.marioogg.command.bukkit.scheduler.SchedulerUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.bukkit.ChatColor;
-import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.slf4j.Logger;
 import org.spigotmc.SpigotConfig;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,7 +27,6 @@ public class CommandNode {
     @Getter private static final List<CommandNode> nodes = new ArrayList<>();
     @Getter private static final HashMap<Class<?>, Object> instances = new HashMap<>();
 
-    // Command information
     private final ArrayList<String> names = new ArrayList<>();
     private final String permission;
     private final String description;
@@ -37,30 +34,21 @@ public class CommandNode {
     private final boolean allowComplete;
     private final boolean hidden;
 
-    // Executor information
     private final boolean playerOnly;
     private final boolean consoleOnly;
 
-    // Reflect information
     private final Object parentClass;
     private final Method method;
 
-    // Arguments information
     private final List<ArgumentNode> parameters = new ArrayList<>();
-
-    // Flags idk
     private final List<FlagNode> flagNodes = new ArrayList<>();
-
-    // The help nodes associated with this node
     private final List<HelpNode> helpNodes = new ArrayList<>();
 
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = BukkitCommandHandler.getLogger();
 
     public CommandNode(Object parentClass, Method method, Command command) {
-        // Loads names
         Arrays.stream(command.names()).forEach(name -> names.add(name.toLowerCase()));
 
-        // Retrieve information from annotation
         this.permission = command.permission();
         this.description = command.description();
         this.async = command.async();
@@ -69,11 +57,9 @@ public class CommandNode {
         this.allowComplete = command.allowComplete();
         this.hidden = command.hidden();
 
-        // Reflection
         this.parentClass = parentClass;
         this.method = method;
 
-        // Register all the argument nodes
         Arrays.stream(method.getParameters()).forEach(parameter -> {
             Param param = parameter.getAnnotation(Param.class);
             if(param == null) return;
@@ -81,33 +67,23 @@ public class CommandNode {
             parameters.add(new ArgumentNode(param.name(), param.concated(), param.required(), param.defaultValue().isEmpty() ? null : param.defaultValue(), parameter));
         });
 
-        // Register all flag nodes
         Arrays.stream(method.getParameters()).forEach(parameter -> {
             Flag flag = parameter.getAnnotation(Flag.class);
             if(flag == null) return;
             flagNodes.add(new FlagNode(flag, parameter));
         });
 
-        // Register bukkit command if it doesn't exist
         names.forEach(name -> {
             if(!BukkitCommand.getCommands().containsKey(name.split(" ")[0].toLowerCase())) new BukkitCommand(name.split(" ")[0].toLowerCase());
         });
 
-        // Makes it so you can use /plugin:command
         List<String> toAdd = new ArrayList<>();
         names.forEach(name -> toAdd.add(BukkitCommandHandler.getPlugin().getName() + ":" + name.toLowerCase()));
         names.addAll(toAdd);
 
-        // Add node to array list
         nodes.add(this);
     }
 
-    /**
-     * Gets the probably that a player is referring to
-     * this command whenever executing a command
-     * @param args Arguments
-     * @return Match Probability
-     */
     public int getMatchProbability(CommandSender sender, String label, String[] args, boolean tabbed) {
         AtomicInteger probability = new AtomicInteger(0);
 
@@ -124,7 +100,6 @@ public class CommandNode {
                         .filter(ArgumentNode::isRequired)
                         .count();
 
-                // Strip flag tokens from args before counting positional args
                 int flagCount = 0;
                 for(String arg : args) {
                     final String a = arg;
@@ -172,9 +147,6 @@ public class CommandNode {
         return probability.get();
     }
 
-    /**
-     * Sends a player the usage message of this command
-     */
     public void sendUsageMessage(CommandSender sender) {
         if(consoleOnly && sender instanceof Player) {
             sender.sendMessage(ChatColor.RED + "This command can only be executed by console.");
@@ -188,6 +160,7 @@ public class CommandNode {
 
         if ((!sender.isOp() || (!permission.isEmpty() && !sender.hasPermission(permission))) && hidden) {
             sender.sendMessage(SpigotConfig.unknownCommandMessage);
+            return;
         }
 
         if(!permission.isEmpty() && !sender.hasPermission(permission)) {
@@ -207,50 +180,33 @@ public class CommandNode {
             builder.append("] ");
         });
 
-        // Sends the usage message
         sender.sendMessage(builder.toString());
     }
 
-    /**
-     * Gets the required arguments length
-     * @return Required Length
-     */
     public int requiredArgumentsLength() {
         int requiredArgumentsLength = names.get(0).split(" ").length - 1;
         for(ArgumentNode node : parameters) if(node.isRequired()) requiredArgumentsLength++;
         return requiredArgumentsLength;
     }
 
-    /**
-     * Executes the command
-     *
-     * @param sender Sender
-     * @param args Arguments
-     */
-    @SneakyThrows
     public void execute(CommandSender sender, String[] args) {
-        // Checks if the player has permission
         if(!permission.isEmpty() && !sender.hasPermission(permission)) {
-            sender.sendMessage(ChatColor.RED+"I'm sorry, but you do not have permission to perform this command.");
+            sender.sendMessage(ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.");
             return;
         }
 
-        // Checks if command is console only
         if(sender instanceof ConsoleCommandSender && playerOnly) {
             sender.sendMessage(ChatColor.RED + "You must be a player to execute this command.");
             return;
         }
 
-        // Checks if command is player only
         if(sender instanceof Player && consoleOnly) {
             sender.sendMessage(ChatColor.RED + "This command is only executable by console.");
             return;
         }
 
-        // Calculates the amount of arguments in the name
         int nameArgs = (names.get(0).split(" ").length - 1);
 
-        // Separate flag tokens from positional args
         Set<String> activatedFlags = new HashSet<>();
         List<String> positionalArgs = new ArrayList<>();
         for(int i = nameArgs; i < args.length; i++) {
@@ -268,7 +224,6 @@ public class CommandNode {
             return;
         }
 
-        // Build positional objects
         List<Object> positionalObjects = new ArrayList<>();
         for(int i = 0; i < positionalArgs.size(); i++) {
             if(parameters.size() < i + 1) break;
@@ -279,7 +234,7 @@ public class CommandNode {
                 for(int x = i; x < positionalArgs.size(); x++) {
                     stringBuilder.append(positionalArgs.get(x)).append(" ");
                 }
-                positionalObjects.add(stringBuilder.substring(0, stringBuilder.toString().length() - 1));
+                positionalObjects.add(stringBuilder.toString().trim());
                 break;
             }
 
@@ -288,7 +243,6 @@ public class CommandNode {
             positionalObjects.add(object);
         }
 
-        // Fill in missing optional positional args
         for(int i = positionalObjects.size(); i < parameters.size(); i++) {
             ArgumentNode argumentNode = parameters.get(i);
             if(argumentNode.getDefaultValue() == null) {
@@ -298,7 +252,6 @@ public class CommandNode {
             }
         }
 
-        // Build final invocation list in method parameter declaration order
         List<Object> objects = new ArrayList<>();
         int positionalIndex = 0;
         for(java.lang.reflect.Parameter mp : method.getParameters()) {
@@ -313,19 +266,24 @@ public class CommandNode {
             } else if(paramAnn != null) {
                 objects.add(positionalIndex < positionalObjects.size() ? positionalObjects.get(positionalIndex++) : null);
             } else {
-                // Sender or other unannotated parameter
                 objects.add(sender);
             }
         }
 
         if(async) {
-            final List<Object> asyncObjects = objects;
-            SchedulerUtil.runAsync(() -> {
-                try { method.invoke(parentClass, asyncObjects.toArray()); } catch(Exception e) { log.error(e); }
-            });
-            return;
+            SchedulerUtil.runAsync(() -> invokeMethod(sender, objects));
+        } else {
+            invokeMethod(sender, objects);
         }
+    }
 
-        method.invoke(parentClass, objects.toArray());
+    private void invokeMethod(CommandSender sender, List<Object> params) {
+        try {
+            method.invoke(parentClass, params.toArray());
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
+            log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), sender.getName(), cause);
+            sender.sendMessage(ChatColor.RED + "An internal error occurred while executing this command.");
+        }
     }
 }

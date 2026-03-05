@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class BungeeCommandHandler {
     @Getter @Setter private static Plugin plugin;
 
-    private static final Logger logger = LoggerFactory.getLogger(BungeeCommandHandler.class);
+    @Getter private static final Logger logger = LoggerFactory.getLogger(plugin.getDescription().getName());
 
     @SneakyThrows
     public static void registerCommands(String path, Plugin plugin) {

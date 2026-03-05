@@ -6,4 +6,5 @@
 - [x] Adding a configurable no permission message (just using spigot's.)
 - [x] Adding a custom tab complete system
 - [ ] Adding the "hidden" setting for Velocity and BungeeCord
-- [ ] Testing the new flags feature
+- [x] Testing the new flags feature
+- [ ] Testing new Bungeecord node

@@ -19,7 +19,7 @@ import java.util.*;
 public class BukkitCommandHandler {
     @Getter @Setter private static Plugin plugin;
 
-    private static final Logger logger = LoggerFactory.getLogger(BukkitCommandHandler.class);
+    @Getter private static final Logger logger = LoggerFactory.getLogger(plugin.getName());
 
     /**
      * Registers commands based off a file path
