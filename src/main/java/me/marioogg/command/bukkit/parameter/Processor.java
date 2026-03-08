@@ -1,4 +1,4 @@
-package me.marioogg.command.parameter;
+package me.marioogg.command.bukkit.parameter;
 
 import lombok.Getter;
 import lombok.SneakyThrows;

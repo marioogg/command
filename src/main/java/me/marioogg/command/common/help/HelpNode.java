@@ -1,4 +1,4 @@
-package me.marioogg.command.help;
+package me.marioogg.command.common.help;
 
 import lombok.Data;
 import java.lang.reflect.Method;

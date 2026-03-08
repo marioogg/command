@@ -2,7 +2,7 @@ package me.marioogg.command.velocity.parameter;
 
 import lombok.Data;
 import lombok.Getter;
-import me.marioogg.command.node.ArgumentNode;
+import me.marioogg.command.bukkit.node.ArgumentNode;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

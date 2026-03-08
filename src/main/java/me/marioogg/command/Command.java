@@ -42,4 +42,9 @@ public @interface Command {
      * Checks if the command can be tab-completed
      */
     boolean allowComplete() default true;
+
+    /**
+     * Checks if the command should be hidden to non-op players (sending an "unknown command" message)
+     */
+    boolean hidden() default false;
 }

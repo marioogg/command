@@ -1,20 +1,25 @@
-package me.marioogg.command;
+package me.marioogg.command.bukkit;
 
 import com.google.common.reflect.ClassPath;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import me.marioogg.command.help.Help;
-import me.marioogg.command.help.HelpNode;
-import me.marioogg.command.node.CommandNode;
-import me.marioogg.command.parameter.ParamProcessor;
-import me.marioogg.command.parameter.Processor;
+import me.marioogg.command.Command;
+import me.marioogg.command.common.help.Help;
+import me.marioogg.command.common.help.HelpNode;
+import me.marioogg.command.bukkit.node.CommandNode;
+import me.marioogg.command.bukkit.parameter.ParamProcessor;
+import me.marioogg.command.bukkit.parameter.Processor;
 import org.bukkit.plugin.Plugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class CommandHandler {
+public class BukkitCommandHandler {
     @Getter @Setter private static Plugin plugin;
+
+    @Getter private static final Logger logger = LoggerFactory.getLogger(plugin.getName());
 
     /**
      * Registers commands based off a file path
@@ -33,8 +38,8 @@ public class CommandHandler {
      */
     @SneakyThrows
     public static void registerCommands(Class<?> commandClass, Plugin plugin) {
-        CommandHandler.setPlugin(plugin);
-        registerCommands(commandClass.newInstance());
+        BukkitCommandHandler.setPlugin(plugin);
+        registerCommands(commandClass.getDeclaredConstructor().newInstance());
     }
 
     /**
@@ -43,9 +48,9 @@ public class CommandHandler {
      */
     @SneakyThrows
     public static void registerCommands(Plugin plugin, Class<?>... commandClasses) {
-        CommandHandler.setPlugin(plugin);
+        BukkitCommandHandler.setPlugin(plugin);
         for (Class<?> commandClass : commandClasses) {
-            registerCommands(commandClass.newInstance());
+            registerCommands(commandClass.getDeclaredConstructor().newInstance());
         }
     }
 
@@ -83,8 +88,8 @@ public class CommandHandler {
                 .filter(info -> info.getPackageName().startsWith(path))
                 .filter(info -> info.load().getSuperclass().equals(Processor.class))
                 .forEach(info -> {
-                    try { ParamProcessor.createProcessor((Processor<?>) info.load().newInstance());
-                    } catch(Exception exception) { exception.printStackTrace(); }
+                    try { ParamProcessor.createProcessor((Processor<?>) info.load().getDeclaredConstructor().newInstance());
+                    } catch(Exception e) { logger.error("Error registering command processors: ", e); }
                 });
     }
 
@@ -101,6 +106,6 @@ public class CommandHandler {
      * @param processors Processors
      */
     public static void registerProcessors(Processor<?>... processors) {
-        Arrays.stream(processors).forEach(CommandHandler::registerProcessor);
+        Arrays.stream(processors).forEach(BukkitCommandHandler::registerProcessor);
     }
 }

@@ -1,6 +1,6 @@
-package me.marioogg.command.parameter.impl;
+package me.marioogg.command.bukkit.parameter.impl;
 
-import me.marioogg.command.parameter.Processor;
+import me.marioogg.command.bukkit.parameter.Processor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+
+@SuppressWarnings("deprecation")
 public class OfflinePlayerProcessor extends Processor<OfflinePlayer> {
     public OfflinePlayer process(CommandSender sender, String supplied) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(supplied);

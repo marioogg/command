@@ -4,8 +4,9 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import me.marioogg.command.bungee.node.BungeeCommandNode;
 import me.marioogg.command.bungee.parameter.BungeeParamProcessor;
-import me.marioogg.command.help.HelpNode;
-import me.marioogg.command.node.ArgumentNode;
+import me.marioogg.command.common.flag.FlagNode;
+import me.marioogg.command.common.help.HelpNode;
+import me.marioogg.command.bukkit.node.ArgumentNode;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -15,10 +16,10 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class BungeeRawCommand extends Command implements TabExecutor {
-    @Getter private static final HashMap<String, BungeeRawCommand> commands = new HashMap<>();
+public class BungeeCommand extends Command implements TabExecutor {
+    @Getter private static final HashMap<String, BungeeCommand> commands = new HashMap<>();
 
-    public BungeeRawCommand(String root) {
+    public BungeeCommand(String root) {
         super(root);
         commands.put(root.toLowerCase(), this);
         me.marioogg.command.bungee.BungeeCommandHandler.getPlugin().getProxy().getPluginManager().registerCommand(
@@ -67,12 +68,36 @@ public class BungeeRawCommand extends Command implements TabExecutor {
 
             if (node.getMatchProbability(sender, getName(), args, true) >= 50) {
                 int extraLength = node.getNames().get(0).split(" ").length - 1;
-                int arg = (args.length - extraLength) - 1;
+                String currentArg = args.length > 0 ? args[args.length - 1] : "";
 
-                if (arg < 0 || node.getParameters().size() < arg + 1) return new ArrayList<>();
+                List<String> positionalSoFar = new ArrayList<>();
+                for (int i = extraLength; i < args.length - 1; i++) {
+                    String a = args[i];
+                    if (node.getFlagNodes().stream().anyMatch(fn -> fn.matches(a))) continue;
+                    positionalSoFar.add(a);
+                }
 
-                ArgumentNode argumentNode = node.getParameters().get(arg);
-                return new BungeeParamProcessor(argumentNode, args[args.length - 1], sender).getTabComplete();
+                List<String> completions = new ArrayList<>();
+
+                if (positionalSoFar.size() < node.getParameters().size()) {
+                    ArgumentNode argumentNode = node.getParameters().get(positionalSoFar.size());
+                    completions.addAll(new BungeeParamProcessor(argumentNode, currentArg, sender).getTabComplete());
+                }
+
+                Set<String> usedFlags = new HashSet<>();
+                for (int i = extraLength; i < args.length - 1; i++) {
+                    String a = args[i];
+                    node.getFlagNodes().stream().filter(fn -> fn.matches(a)).findFirst()
+                            .ifPresent(fn -> usedFlags.add(fn.getValue()));
+                }
+                for (FlagNode fn : node.getFlagNodes()) {
+                    if (usedFlags.contains(fn.getValue())) continue;
+                    for (String token : fn.getTokens()) {
+                        if (token.toLowerCase().startsWith(currentArg.toLowerCase())) completions.add(token);
+                    }
+                }
+
+                return completions;
             }
 
             return sortedNodes.stream()

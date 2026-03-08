@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'me.marioogg'
-version '1.1'
+version 'DEV-1'
 
 repositories {
     maven { url 'https://maven.marioogg.dev/repository/public/' }
@@ -40,17 +40,24 @@ dependencies {
     compileOnly('org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT') {
         exclude group: 'net.md-5'
     }
+    compileOnly('org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT')
     compileOnly('dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT') {
         exclude group: 'net.md-5'
     }
     compileOnly 'net.md-5:bungeecord-api:1.20-R0.2-SNAPSHOT'
     compileOnly 'com.velocitypowered:velocity-api:3.3.0-SNAPSHOT'
     implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.25.3'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 tasks.shadowJar {

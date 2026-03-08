@@ -2,3 +2,6 @@
 .idea/
 build/
 target/
+qodana.yaml
+todo.md
+command.iml

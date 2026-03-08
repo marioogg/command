@@ -1,4 +1,4 @@
-package me.marioogg.command.parameter;
+package me.marioogg.command.bukkit.parameter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

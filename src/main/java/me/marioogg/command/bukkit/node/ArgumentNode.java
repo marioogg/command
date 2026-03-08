@@ -1,4 +1,4 @@
-package me.marioogg.command.node;
+package me.marioogg.command.bukkit.node;
 
 import lombok.Data;
 

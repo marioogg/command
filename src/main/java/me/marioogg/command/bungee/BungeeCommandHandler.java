@@ -7,14 +7,18 @@ import lombok.SneakyThrows;
 import me.marioogg.command.bungee.node.BungeeCommandNode;
 import me.marioogg.command.bungee.parameter.BungeeParamProcessor;
 import me.marioogg.command.bungee.parameter.BungeeProcessor;
-import me.marioogg.command.help.Help;
-import me.marioogg.command.help.HelpNode;
+import me.marioogg.command.common.help.Help;
+import me.marioogg.command.common.help.HelpNode;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
 public class BungeeCommandHandler {
     @Getter @Setter private static Plugin plugin;
+
+    @Getter private static final Logger logger = LoggerFactory.getLogger(plugin.getDescription().getName());
 
     @SneakyThrows
     public static void registerCommands(String path, Plugin plugin) {
@@ -26,14 +30,14 @@ public class BungeeCommandHandler {
     @SneakyThrows
     public static void registerCommands(Class<?> commandClass, Plugin plugin) {
         BungeeCommandHandler.setPlugin(plugin);
-        registerCommands(commandClass.newInstance());
+        registerCommands(commandClass.getDeclaredConstructor().newInstance());
     }
 
     @SneakyThrows
     public static void registerCommands(Plugin plugin, Class<?>... commandClasses) {
         BungeeCommandHandler.setPlugin(plugin);
         for (Class<?> commandClass : commandClasses) {
-            registerCommands(commandClass.newInstance());
+            registerCommands(commandClass.getDeclaredConstructor().newInstance());
         }
     }
 
@@ -62,8 +66,8 @@ public class BungeeCommandHandler {
                 .filter(info -> info.getPackageName().startsWith(path))
                 .filter(info -> info.load().getSuperclass().equals(BungeeProcessor.class))
                 .forEach(info -> {
-                    try { BungeeParamProcessor.createProcessor((BungeeProcessor<?>) info.load().newInstance());
-                    } catch (Exception e) { e.printStackTrace(); }
+                    try { BungeeParamProcessor.createProcessor((BungeeProcessor<?>) info.load().getDeclaredConstructor().newInstance());
+                    } catch (Exception e) { logger.error("Error registering command processors: ", e); }
                 });
     }
 

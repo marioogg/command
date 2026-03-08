@@ -1,4 +1,4 @@
-package me.marioogg.command.help;
+package me.marioogg.command.common.help;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

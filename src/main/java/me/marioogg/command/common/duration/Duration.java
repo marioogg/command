@@ -1,4 +1,4 @@
-package me.marioogg.command.duration;
+package me.marioogg.command.common.duration;
 
 import lombok.Data;
 

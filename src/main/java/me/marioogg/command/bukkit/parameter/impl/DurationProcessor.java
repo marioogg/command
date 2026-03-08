@@ -1,7 +1,7 @@
-package me.marioogg.command.parameter.impl;
+package me.marioogg.command.bukkit.parameter.impl;
 
-import me.marioogg.command.duration.Duration;
-import me.marioogg.command.parameter.Processor;
+import me.marioogg.command.common.duration.Duration;
+import me.marioogg.command.bukkit.parameter.Processor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 

@@ -2,7 +2,7 @@ package me.marioogg.command.bungee.parameter;
 
 import lombok.Data;
 import lombok.Getter;
-import me.marioogg.command.node.ArgumentNode;
+import me.marioogg.command.bukkit.node.ArgumentNode;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 

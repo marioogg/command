@@ -5,11 +5,13 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import me.marioogg.command.help.Help;
-import me.marioogg.command.help.HelpNode;
+import me.marioogg.command.common.help.Help;
+import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.velocity.node.VelocityCommandNode;
 import me.marioogg.command.velocity.parameter.VelocityParamProcessor;
 import me.marioogg.command.velocity.parameter.VelocityProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -17,9 +19,15 @@ public class VelocityCommandHandler {
     @Getter @Setter private static Object plugin;
     @Getter @Setter private static ProxyServer proxy;
 
+    private static Logger logger;
+
     public static void init(Object plugin, ProxyServer proxy) {
         VelocityCommandHandler.plugin = plugin;
         VelocityCommandHandler.proxy = proxy;
+        String pluginName = proxy.getPluginManager().fromInstance(plugin)
+                .map(container -> container.getDescription().getId())
+                .orElse(plugin.getClass().getSimpleName()); //backup because in some old versions it breaks
+        VelocityCommandHandler.logger = LoggerFactory.getLogger(pluginName);
     }
 
     @SneakyThrows
@@ -33,18 +41,18 @@ public class VelocityCommandHandler {
     @SneakyThrows
     public static void registerCommands(Class<?> commandClass, Object plugin, ProxyServer proxy) {
         VelocityCommandHandler.init(plugin, proxy);
-        registerCommands(commandClass.newInstance());
+        registerCommands(commandClass.getDeclaredConstructor().newInstance());
     }
 
     @SneakyThrows
     public static void registerCommands(Object plugin, ProxyServer proxy, Class<?>... commandClasses) {
         VelocityCommandHandler.init(plugin, proxy);
         for (Class<?> commandClass : commandClasses) {
-            registerCommands(commandClass.newInstance());
+            registerCommands(commandClass.getDeclaredConstructor().newInstance());
         }
     }
 
-    public static void registerCommands(Object commandClass) {
+    private static void registerCommands(Object commandClass) {
         Arrays.stream(commandClass.getClass().getDeclaredMethods()).forEach(method -> {
             me.marioogg.command.Command command = method.getAnnotation(me.marioogg.command.Command.class);
             if (command == null) return;
@@ -69,8 +77,8 @@ public class VelocityCommandHandler {
                 .filter(info -> info.getPackageName().startsWith(path))
                 .filter(info -> info.load().getSuperclass().equals(VelocityProcessor.class))
                 .forEach(info -> {
-                    try { VelocityParamProcessor.createProcessor((VelocityProcessor<?>) info.load().newInstance());
-                    } catch (Exception e) { e.printStackTrace(); }
+                    try { VelocityParamProcessor.createProcessor((VelocityProcessor<?>) info.load().getDeclaredConstructor().newInstance());
+                    } catch (Exception e) { logger.error("Error registering command processors: ", e); }
                 });
     }
 
