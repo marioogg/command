@@ -9,6 +9,7 @@ To keep my Java packages ordered, I'll probably rename the packages to `me.mario
 
 ### Features
 * Well-documented and javadoc'ed annotation command registration
+* Easy-to-use `@Subcommand` annotations system. (check wiki)
 * Flexible and easy-to-use parameter annotation system (`@Param`)
 * Also flexible and easy to use flag system (e.g. --silent or -s) (`@Flag`) (to be finished)
 * Automatic tab completion
