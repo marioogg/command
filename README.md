@@ -1,10 +1,5 @@
 # MC Command Framework
 
-# EVEN BIGGER DISCLAIMER:
-Everything developed in this branch is still on development! 
-I can't assure that this will work on your server and even less be stable. 
-I'd recommend using the [master branch](https://github.com/marioogg/command/tree/master) and the stable builds provided [in the wiki](https://github.com/marioogg/command/wiki), although if you want to risk it, at least use [the beta branch](https://github.com/marioogg/command/tree/beta) that at least those features are tested, 
-these are untested, purely new-coded features that will receive no support at all!
 
 
 ### DISCLAIMER:
