@@ -1,4 +1,4 @@
-package me.marioogg.command.bungee.bukkit;
+package me.marioogg.command.bungee;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
