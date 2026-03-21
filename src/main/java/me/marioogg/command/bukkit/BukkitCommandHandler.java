@@ -2,7 +2,6 @@ package me.marioogg.command.bukkit;
 
 import com.google.common.reflect.ClassPath;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import me.marioogg.command.Command;
 import me.marioogg.command.Subcommand;
@@ -11,11 +10,13 @@ import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.bukkit.node.CommandNode;
 import me.marioogg.command.bukkit.parameter.ParamProcessor;
 import me.marioogg.command.bukkit.parameter.Processor;
+import me.marioogg.command.common.help.Help;
+import me.marioogg.command.common.help.HelpNode;
 import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Arrays;
 
 public class BukkitCommandHandler {
 
@@ -29,10 +30,6 @@ public class BukkitCommandHandler {
         logger = LoggerFactory.getLogger(plugin.getName());
     }
 
-    /**
-     * Registers commands based off a file path
-     * @param path Path
-     */
     @SneakyThrows
     public static void registerCommands(String path, Plugin plugin) {
         ClassPath.from(plugin.getClass().getClassLoader()).getAllClasses().stream()
@@ -45,22 +42,15 @@ public class BukkitCommandHandler {
                 .forEach(clazz -> registerCommands(clazz, plugin));
     }
 
-    /**
-     * Registers the commands in the class
-     * @param commandClass Class
-     */
     @SneakyThrows
     public static void registerCommands(Class<?> commandClass, Plugin plugin) {
         if (commandClass.isAnonymousClass() || commandClass.isLocalClass()
                 || commandClass.isInterface() || java.lang.reflect.Modifier.isAbstract(commandClass.getModifiers())) return;
         BukkitCommandHandler.setPlugin(plugin);
+        if (!isInstantiable(commandClass)) return;
         registerCommands(commandClass.getDeclaredConstructor().newInstance());
     }
 
-    /**
-     * Registers the commands in the class
-     * @param commandClasses Classes
-     */
     @SneakyThrows
     public static void registerCommands(Plugin plugin, Class<?>... commandClasses) {
         BukkitCommandHandler.setPlugin(plugin);
@@ -71,10 +61,6 @@ public class BukkitCommandHandler {
         }
     }
 
-    /**
-     * Registers the commands in the class
-     * @param commandClass Class
-     */
     public static void registerCommands(Object commandClass) {
         Subcommand subcommand = commandClass.getClass().getAnnotation(Subcommand.class);
 
@@ -98,8 +84,7 @@ public class BukkitCommandHandler {
 
         Arrays.stream(commandClass.getClass().getDeclaredMethods()).forEach(method -> {
             Help help = method.getAnnotation(Help.class);
-            if(help == null) return;
-
+            if (help == null) return;
             HelpNode helpNode = new HelpNode(commandClass, help.names(), help.permission(), method);
             CommandNode.getNodes().forEach(node -> node.getNames().forEach(name -> Arrays.stream(help.names())
                     .map(String::toLowerCase)
@@ -108,33 +93,25 @@ public class BukkitCommandHandler {
         });
     }
 
-    /**
-     * Registers processors based off a file path
-     * @param path Path
-     */
     @SneakyThrows
     public static void registerProcessors(String path, Plugin plugin) {
         ClassPath.from(plugin.getClass().getClassLoader()).getAllClasses().stream()
                 .filter(info -> info.getPackageName().startsWith(path))
+                .filter(info -> isInstantiable(info.load()))
                 .filter(info -> info.load().getSuperclass().equals(Processor.class))
                 .forEach(info -> {
-                    try { ParamProcessor.createProcessor((Processor<?>) info.load().getDeclaredConstructor().newInstance());
-                    } catch(Exception e) { logger.error("Error registering command processors: ", e); }
+                    try {
+                        ParamProcessor.createProcessor((Processor<?>) info.load().getDeclaredConstructor().newInstance());
+                    } catch (Exception e) {
+                        logger.error("Error registering command processors: ", e);
+                    }
                 });
     }
 
-    /**
-     * Register processor
-     * @param processor Processor
-     */
     public static void registerProcessor(Processor<?> processor) {
         ParamProcessor.createProcessor(processor);
     }
 
-    /**
-     * Register processors
-     * @param processors Processors
-     */
     public static void registerProcessors(Processor<?>... processors) {
         Arrays.stream(processors).forEach(BukkitCommandHandler::registerProcessor);
     }
