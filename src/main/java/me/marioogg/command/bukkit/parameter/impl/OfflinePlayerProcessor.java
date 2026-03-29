@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-
+/**
+ * Resolves offline player values for command parameters.
+ */
 @SuppressWarnings("deprecation")
 public class OfflinePlayerProcessor extends Processor<OfflinePlayer> {
     public OfflinePlayer process(CommandSender sender, String supplied) {

@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Parses boolean-like command input values.
+ */
 public class BooleanProcessor extends Processor<Boolean> {
     private final Map<String, Boolean> values = new HashMap<>();
 

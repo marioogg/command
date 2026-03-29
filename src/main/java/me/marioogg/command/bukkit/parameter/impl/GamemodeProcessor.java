@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Parses game mode values for command parameters.
+ */
 public class GamemodeProcessor extends Processor<GameMode> {
 
     public GameMode process(CommandSender sender, String supplied) {

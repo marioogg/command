@@ -16,6 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
+/**
+ * Handles command and processor registration for Bukkit.
+ */
 public class BukkitCommandHandler {
 
     @Getter

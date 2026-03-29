@@ -4,6 +4,9 @@ import me.marioogg.command.bukkit.parameter.Processor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+/**
+ * Parses float values for command parameters.
+ */
 public class FloatProcessor extends Processor<Float> {
     public Float process(CommandSender sender, String supplied) {
         try {

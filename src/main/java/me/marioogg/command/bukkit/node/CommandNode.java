@@ -22,6 +22,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Stores and executes Bukkit command metadata.
+ */
 @Getter
 public class CommandNode {
     @Getter private static final List<CommandNode> nodes = new ArrayList<>();

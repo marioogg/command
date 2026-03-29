@@ -4,6 +4,9 @@ import me.marioogg.command.bukkit.parameter.Processor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+/**
+ * Parses integer values for command parameters.
+ */
 public class IntegerProcessor extends Processor<Integer> {
     public Integer process(CommandSender sender, String supplied) {
         try {

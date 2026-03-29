@@ -9,6 +9,9 @@ import org.bukkit.command.CommandSender;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Resolves world values for command parameters.
+ */
 public class WorldProcessor extends Processor<World> {
     @Override
     public World process(CommandSender sender, String supplied) {

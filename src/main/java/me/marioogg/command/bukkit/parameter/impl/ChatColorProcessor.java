@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Parses chat color values for command parameters.
+ */
 public class ChatColorProcessor extends Processor<ChatColor> {
 
     public ChatColor process(CommandSender sender, String supplied) {

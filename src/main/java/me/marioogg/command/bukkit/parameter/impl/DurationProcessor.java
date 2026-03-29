@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Parses duration values for command parameters.
+ */
 public class DurationProcessor extends Processor<Duration> {
 
     private final List<String> defaults = Arrays.asList(

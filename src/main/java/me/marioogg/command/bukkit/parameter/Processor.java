@@ -9,6 +9,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Base processor for Bukkit command parameter types.
+ */
 @Getter
 public abstract class Processor<T> {
 

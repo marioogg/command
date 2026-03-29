@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
+/**
+ * Utility methods for running tasks on Bukkit and Folia schedulers.
+ */
 public class SchedulerUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerUtil.class);

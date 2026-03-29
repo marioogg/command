@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Resolves and tab-completes command parameters for Bukkit.
+ */
 @Data
 public class ParamProcessor {
     @Getter private static final HashMap<Class<?>, Processor<?>> processors = new HashMap<>();

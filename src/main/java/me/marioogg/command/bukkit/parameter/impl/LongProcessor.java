@@ -4,6 +4,9 @@ import me.marioogg.command.bukkit.parameter.Processor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+/**
+ * Parses long values for command parameters.
+ */
 public class LongProcessor extends Processor<Long> {
     public Long process(CommandSender sender, String supplied) {
         try {

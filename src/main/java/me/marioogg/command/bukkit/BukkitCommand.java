@@ -18,6 +18,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Raw Bukkit command entry point for registered command nodes.
+ */
 public class BukkitCommand extends Command {
     @Getter private static final HashMap<String, BukkitCommand> commands = new HashMap<>();
     private static final Logger log = BukkitCommandHandler.getLogger();

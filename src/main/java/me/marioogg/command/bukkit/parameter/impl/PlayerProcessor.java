@@ -9,6 +9,9 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Resolves online player values for command parameters.
+ */
 public class PlayerProcessor extends Processor<Player> {
     public Player process(CommandSender sender, String supplied) {
         Player player = Bukkit.getPlayer(supplied);

@@ -4,6 +4,9 @@ import me.marioogg.command.bukkit.parameter.Processor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+/**
+ * Parses double values for command parameters.
+ */
 public class DoubleProcessor extends Processor<Double> {
     public Double process(CommandSender sender, String supplied) {
         try {

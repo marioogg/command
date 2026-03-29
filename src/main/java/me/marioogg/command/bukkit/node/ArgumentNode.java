@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.lang.reflect.Parameter;
 
+/**
+ * Stores metadata for a command argument parameter.
+ */
 @Data
 public class ArgumentNode {
     private final String name;
