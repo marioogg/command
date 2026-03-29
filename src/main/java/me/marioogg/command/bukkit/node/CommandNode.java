@@ -4,13 +4,15 @@ import lombok.Getter;
 import me.marioogg.command.Command;
 import me.marioogg.command.bukkit.BukkitCommandHandler;
 import me.marioogg.command.bukkit.BukkitCommand;
+import me.marioogg.command.common.cooldown.Cooldown;
+import me.marioogg.command.common.cooldown.CooldownManager;
+import me.marioogg.command.common.cooldown.CooldownNode;
 import me.marioogg.command.common.flag.Flag;
 import me.marioogg.command.common.flag.FlagNode;
 import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.bukkit.parameter.Param;
 import me.marioogg.command.bukkit.parameter.ParamProcessor;
 import me.marioogg.command.bukkit.scheduler.SchedulerUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -44,6 +46,8 @@ public class CommandNode {
     private final Object parentClass;
     private final Method method;
 
+    private final CooldownNode cooldownNode;
+
     private final List<ArgumentNode> parameters = new ArrayList<>();
     private final List<FlagNode> flagNodes = new ArrayList<>();
     private final List<HelpNode> helpNodes = new ArrayList<>();
@@ -76,6 +80,9 @@ public class CommandNode {
             if(flag == null) return;
             flagNodes.add(new FlagNode(flag, parameter));
         });
+
+        Cooldown cooldown = method.getAnnotation(Cooldown.class);
+        this.cooldownNode = cooldown != null ? new CooldownNode(cooldown.seconds(), cooldown.bypassPermission()) : null;
 
         names.forEach(name -> {
             if(!BukkitCommand.getCommands().containsKey(name.split(" ")[0].toLowerCase())) new BukkitCommand(name.split(" ")[0].toLowerCase());
@@ -195,18 +202,29 @@ public class CommandNode {
 
     public void execute(CommandSender sender, String[] args) {
         if(!permission.isEmpty() && !sender.hasPermission(permission)) {
-            sender.sendMessage(ChatColor.RED + BukkitCommandHandler.getNoPermissionMessage());
+            sender.sendMessage(BukkitCommandHandler.getNoPermissionMessage());
             return;
         }
 
         if(sender instanceof ConsoleCommandSender && playerOnly) {
-            sender.sendMessage(ChatColor.RED + BukkitCommandHandler.getPlayerOnlyMessage());
+            sender.sendMessage(BukkitCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
         if(sender instanceof Player && consoleOnly) {
-            sender.sendMessage(ChatColor.RED + BukkitCommandHandler.getConsoleOnlyMessage());
+            sender.sendMessage(BukkitCommandHandler.getConsoleOnlyMessage());
             return;
+        }
+
+        if (cooldownNode != null && sender instanceof Player player) {
+            if (cooldownNode.getBypassPermission().isEmpty() || !player.hasPermission(cooldownNode.getBypassPermission())) {
+                if (CooldownManager.isOnCooldown(player.getUniqueId(), names.get(0))) {
+                    long remaining = CooldownManager.getRemainingSeconds(player.getUniqueId(), names.get(0));
+                    sender.sendMessage(BukkitCommandHandler.getCooldownMessage().replace("{seconds}", String.valueOf(remaining)));
+                    return;
+                }
+                CooldownManager.setCooldown(player.getUniqueId(), names.get(0), cooldownNode.getSeconds());
+            }
         }
 
         int nameArgs = (names.get(0).split(" ").length - 1);
@@ -287,7 +305,7 @@ public class CommandNode {
         } catch (IllegalAccessException | InvocationTargetException e) {
             Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
             log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), sender.getName(), cause);
-            sender.sendMessage(ChatColor.RED + BukkitCommandHandler.getInternalErrorMessage());
+            sender.sendMessage(BukkitCommandHandler.getInternalErrorMessage());
         }
     }
 }

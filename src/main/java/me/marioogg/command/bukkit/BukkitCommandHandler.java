@@ -28,12 +28,11 @@ public class BukkitCommandHandler {
     @Getter
     private static Logger logger;
 
-
-    @Setter @Getter private static String noPermissionMessage = ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.";
-    @Setter @Getter private static String playerOnlyMessage = ChatColor.RED + "You must be a player to execute this command.";
-    @Setter @Getter private static String consoleOnlyMessage = ChatColor.RED + "This command can only be executed by console.";
-    @Setter @Getter private static String internalErrorMessage = ChatColor.RED + "An internal error occurred while executing this command.";
-
+    @Getter @Setter private static String noPermissionMessage = ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.";
+    @Getter @Setter private static String playerOnlyMessage = ChatColor.RED + "You must be a player to execute this command.";
+    @Getter @Setter private static String consoleOnlyMessage = ChatColor.RED + "This command can only be executed by console.";
+    @Getter @Setter private static String internalErrorMessage = ChatColor.RED + "An internal error occurred while executing this command.";
+    @Getter @Setter private static String cooldownMessage = ChatColor.RED + "You must wait {seconds} more second(s) before using this command again.";
 
     public static void setPlugin(Plugin plugin) {
         BukkitCommandHandler.plugin = plugin;
@@ -154,5 +153,4 @@ public class BukkitCommandHandler {
                 && Arrays.stream(clazz.getDeclaredConstructors())
                 .anyMatch(c -> c.getParameterCount() == 0);
     }
-
 }
