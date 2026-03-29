@@ -5,3 +5,4 @@ target/
 qodana.yaml
 todo.md
 command.iml
+/.todo/
