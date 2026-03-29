@@ -23,8 +23,8 @@ publishing {
     repositories {
         maven {
             def isSnapshot = version.toString().endsWith("SNAPSHOT")
-            def releasesRepoUrl = "https://maven.marioogg.dev/repository/releases"
-            def snapshotsRepoUrl = "https://maven.marioogg.dev/repository/snapshots"
+            def releasesRepoUrl = "https://maven.marioogg.dev/repository/private"
+            def snapshotsRepoUrl = "https://maven.marioogg.dev/repository/private"
 
             url = uri(isSnapshot ? snapshotsRepoUrl : releasesRepoUrl)
 
