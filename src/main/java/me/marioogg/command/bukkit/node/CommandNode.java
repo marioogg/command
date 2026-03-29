@@ -10,6 +10,7 @@ import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.bukkit.parameter.Param;
 import me.marioogg.command.bukkit.parameter.ParamProcessor;
 import me.marioogg.command.bukkit.scheduler.SchedulerUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -152,12 +153,12 @@ public class CommandNode {
 
     public void sendUsageMessage(CommandSender sender) {
         if(consoleOnly && sender instanceof Player) {
-            sender.sendMessage(ChatColor.RED + "This command can only be executed by console.");
+            sender.sendMessage(BukkitCommandHandler.getConsoleOnlyMessage());
             return;
         }
 
         if(playerOnly && sender instanceof ConsoleCommandSender) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to execute this command.");
+            sender.sendMessage(BukkitCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
@@ -167,7 +168,7 @@ public class CommandNode {
         }
 
         if(!permission.isEmpty() && !sender.hasPermission(permission)) {
-            sender.sendMessage(ChatColor.RED + "I'm sorry, you do not have permission to execute this command.");
+            sender.sendMessage(BukkitCommandHandler.getNoPermissionMessage());
             return;
         }
 
@@ -194,17 +195,17 @@ public class CommandNode {
 
     public void execute(CommandSender sender, String[] args) {
         if(!permission.isEmpty() && !sender.hasPermission(permission)) {
-            sender.sendMessage(ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.");
+            sender.sendMessage(ChatColor.RED + BukkitCommandHandler.getNoPermissionMessage());
             return;
         }
 
         if(sender instanceof ConsoleCommandSender && playerOnly) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to execute this command.");
+            sender.sendMessage(ChatColor.RED + BukkitCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
         if(sender instanceof Player && consoleOnly) {
-            sender.sendMessage(ChatColor.RED + "This command is only executable by console.");
+            sender.sendMessage(ChatColor.RED + BukkitCommandHandler.getConsoleOnlyMessage());
             return;
         }
 
@@ -286,7 +287,7 @@ public class CommandNode {
         } catch (IllegalAccessException | InvocationTargetException e) {
             Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
             log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), sender.getName(), cause);
-            sender.sendMessage(ChatColor.RED + "An internal error occurred while executing this command.");
+            sender.sendMessage(ChatColor.RED + BukkitCommandHandler.getInternalErrorMessage());
         }
     }
 }

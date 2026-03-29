@@ -2,6 +2,7 @@ package me.marioogg.command.bukkit;
 
 import com.google.common.reflect.ClassPath;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import me.marioogg.command.Command;
 import me.marioogg.command.Subcommand;
@@ -10,6 +11,7 @@ import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.bukkit.node.CommandNode;
 import me.marioogg.command.bukkit.parameter.ParamProcessor;
 import me.marioogg.command.bukkit.parameter.Processor;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,13 @@ public class BukkitCommandHandler {
     private static Plugin plugin;
     @Getter
     private static Logger logger;
+
+    @Setter
+    @Getter private static String noPermissionMessage = ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.";
+    @Getter private static String playerOnlyMessage = ChatColor.RED + "You must be a player to execute this command.";
+    @Getter private static String consoleOnlyMessage = ChatColor.RED + "This command can only be executed by console.";
+    @Getter private static String internalErrorMessage = ChatColor.RED + "An internal error occurred while executing this command.";
+
 
     public static void setPlugin(Plugin plugin) {
         BukkitCommandHandler.plugin = plugin;
@@ -145,4 +154,5 @@ public class BukkitCommandHandler {
                 && Arrays.stream(clazz.getDeclaredConstructors())
                 .anyMatch(c -> c.getParameterCount() == 0);
     }
+
 }
