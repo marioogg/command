@@ -12,6 +12,8 @@ import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.velocity.node.VelocityCommandNode;
 import me.marioogg.command.velocity.parameter.VelocityParamProcessor;
 import me.marioogg.command.velocity.parameter.VelocityProcessor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,11 @@ public class VelocityCommandHandler {
     @Getter @Setter private static ProxyServer proxy;
 
     private static Logger logger;
+
+    @Setter @Getter private static Component noPermissionMessage = Component.text("I'm sorry, but you do not have permission to perform this command.", NamedTextColor.RED);
+    @Setter @Getter private static Component playerOnlyMessage = Component.text("You must be a player to execute this command.", NamedTextColor.RED);
+    @Setter @Getter private static Component consoleOnlyMessage = Component.text("This command can only be executed by console.", NamedTextColor.RED);
+    @Setter @Getter private static Component internalErrorMessage = Component.text("An internal error occurred while executing this command.", NamedTextColor.RED);
     
     public static void init(Object plugin, ProxyServer proxy) {
         VelocityCommandHandler.plugin = plugin;

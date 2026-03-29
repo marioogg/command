@@ -42,7 +42,7 @@ public class VelocityRawCommand implements RawCommand {
 
         List<VelocityCommandNode> sortedNodes = VelocityCommandNode.getNodes().stream()
                 .sorted(Comparator.comparingInt(node -> node.getMatchProbability(source, root, args, false)))
-                .collect(Collectors.toList());
+                .toList();
 
         VelocityCommandNode node = sortedNodes.get(sortedNodes.size() - 1);
 
@@ -55,7 +55,7 @@ public class VelocityRawCommand implements RawCommand {
             HelpNode helpNode = node.getHelpNodes().get(0);
 
             if (!helpNode.getPermission().isEmpty() && !source.hasPermission(helpNode.getPermission())) {
-                source.sendMessage(Component.text("I'm sorry, although you do not have permission to execute this command.", NamedTextColor.RED));
+                source.sendMessage(VelocityCommandHandler.getNoPermissionMessage());
                 return;
             }
 

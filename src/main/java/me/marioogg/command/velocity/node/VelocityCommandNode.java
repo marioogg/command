@@ -141,17 +141,17 @@ public class VelocityCommandNode{
 
     public void sendUsageMessage(CommandSource source) {
         if (consoleOnly && source instanceof Player) {
-            source.sendMessage(Component.text("This command can only be executed by console.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getConsoleOnlyMessage());
             return;
         }
 
         if (playerOnly && !(source instanceof Player)) {
-            source.sendMessage(Component.text("You must be a player to execute this command.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
         if (!permission.isEmpty() && !source.hasPermission(permission)) {
-            source.sendMessage(Component.text("I'm sorry, you do not have permission to execute this command.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getNoPermissionMessage());
             return;
         }
 
@@ -179,17 +179,17 @@ public class VelocityCommandNode{
     @SneakyThrows
     public void execute(CommandSource source, String[] args) {
         if (!permission.isEmpty() && !source.hasPermission(permission)) {
-            source.sendMessage(Component.text("I'm sorry, although you do not have permission to execute this command.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getNoPermissionMessage());
             return;
         }
 
         if (!(source instanceof Player) && playerOnly) {
-            source.sendMessage(Component.text("You must be a player to execute this command.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
         if (source instanceof Player && consoleOnly) {
-            source.sendMessage(Component.text("This command is only executable by console.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getConsoleOnlyMessage());
             return;
         }
 
