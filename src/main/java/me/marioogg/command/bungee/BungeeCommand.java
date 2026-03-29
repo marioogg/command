@@ -16,6 +16,9 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Raw Bungee command entry point for registered command nodes.
+ */
 public class BungeeCommand extends Command implements TabExecutor {
     @Getter private static final HashMap<String, BungeeCommand> commands = new HashMap<>();
 
@@ -117,4 +120,3 @@ public class BungeeCommand extends Command implements TabExecutor {
         }
     }
 }
-

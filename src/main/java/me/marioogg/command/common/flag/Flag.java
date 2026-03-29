@@ -18,19 +18,17 @@ import java.lang.annotation.Target;
  * }</pre>
  *
  * Flags are always optional and default to {@code false}.
- * They can appear anywhere in the argument list and are stripped out
- * before positional parameters are resolved.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface Flag {
     /**
-     * The short flag name e.g. {@code "-s"}.
+     * The short flag name ex: {@code "-s"}.
      */
     String value();
 
     /**
-     * Optional long-form aliases e.g. {@code "--silent"}.
+     * Optional long-form aliases ex: {@code "--silent"}.
      */
     String[] aliases() default {};
 

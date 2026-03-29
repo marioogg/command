@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
+/**
+ * Handles command and processor registration for Bungee.
+ */
 public class BungeeCommandHandler {
     @Getter @Setter private static Plugin plugin;
 
@@ -118,4 +121,3 @@ public class BungeeCommandHandler {
         };
     }
 }
-
