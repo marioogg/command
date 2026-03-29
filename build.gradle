@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'me.marioogg'
-version '1.2.1'
+version '2.0-b1'
 
 repositories {
     maven { url 'https://maven.marioogg.dev/repository/public/' }
