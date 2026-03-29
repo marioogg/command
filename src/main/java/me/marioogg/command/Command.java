@@ -19,7 +19,7 @@ public @interface Command {
     String permission() default "";
 
     /**
-     * Whether or not the command is ran asynchronously
+     * Whether the command is ran asynchronously
      */
     boolean async() default false;
 

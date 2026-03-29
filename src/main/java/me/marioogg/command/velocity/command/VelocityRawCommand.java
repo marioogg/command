@@ -16,6 +16,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Raw Velocity command entry point for registered command nodes.
+ */
 public class VelocityRawCommand implements RawCommand {
     @Getter private static final HashMap<String, VelocityRawCommand> commands = new HashMap<>();
 
@@ -128,4 +131,3 @@ public class VelocityRawCommand implements RawCommand {
         }
     }
 }
-

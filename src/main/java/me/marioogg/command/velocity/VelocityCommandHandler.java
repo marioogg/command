@@ -17,12 +17,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
+
+/**
+ * Handles command and processor registration for Velocity.
+ */
+@SuppressWarnings("all")
 public class VelocityCommandHandler {
     @Getter @Setter private static Object plugin;
     @Getter @Setter private static ProxyServer proxy;
 
     private static Logger logger;
-
+    
     public static void init(Object plugin, ProxyServer proxy) {
         VelocityCommandHandler.plugin = plugin;
         VelocityCommandHandler.proxy = proxy;
@@ -129,4 +134,3 @@ public class VelocityCommandHandler {
         };
     }
 }
-

@@ -9,6 +9,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Base processor for Velocity command parameter types.
+ */
 @Getter
 public abstract class VelocityProcessor<T> {
 
@@ -33,4 +36,3 @@ public abstract class VelocityProcessor<T> {
         return new ArrayList<>();
     }
 }
-

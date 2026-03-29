@@ -10,8 +10,6 @@ import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.bukkit.node.CommandNode;
 import me.marioogg.command.bukkit.parameter.ParamProcessor;
 import me.marioogg.command.bukkit.parameter.Processor;
-import me.marioogg.command.common.help.Help;
-import me.marioogg.command.common.help.HelpNode;
 import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

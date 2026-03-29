@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Resolves and tab-completes command parameters for Velocity.
+ */
 @Data
 public class VelocityParamProcessor {
     @Getter private static final HashMap<Class<?>, VelocityProcessor<?>> processors = new HashMap<>();
@@ -83,4 +86,3 @@ public class VelocityParamProcessor {
         });
     }
 }
-

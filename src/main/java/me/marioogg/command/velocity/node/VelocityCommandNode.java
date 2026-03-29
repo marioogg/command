@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Stores and executes Velocity command metadata.
+ */
 @Getter
 public class VelocityCommandNode{
     @Getter private static final List<VelocityCommandNode> nodes = new ArrayList<>();
@@ -271,4 +274,3 @@ public class VelocityCommandNode{
         method.invoke(parentClass, objects.toArray());
     }
 }
-
