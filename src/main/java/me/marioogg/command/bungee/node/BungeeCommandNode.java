@@ -146,17 +146,17 @@ public class BungeeCommandNode {
 
     public void sendUsageMessage(CommandSender sender) {
         if (consoleOnly && sender instanceof ProxiedPlayer) {
-            sender.sendMessage(new TextComponent(ChatColor.RED + "This command can only be executed by console."));
+            sender.sendMessage(new TextComponent(BungeeCommandHandler.getConsoleOnlyMessage()));
             return;
         }
 
         if (playerOnly && !(sender instanceof ProxiedPlayer)) {
-            sender.sendMessage(new TextComponent(ChatColor.RED + "You must be a player to execute this command."));
+            sender.sendMessage(new TextComponent(BungeeCommandHandler.getPlayerOnlyMessage()));
             return;
         }
 
         if (!permission.isEmpty() && !sender.hasPermission(permission)) {
-            sender.sendMessage(new TextComponent(ChatColor.RED + "I'm sorry, you do not have permission to execute this command."));
+            sender.sendMessage(new TextComponent(BungeeCommandHandler.getNoPermissionMessage()));
             return;
         }
 
@@ -184,23 +184,22 @@ public class BungeeCommandNode {
     @SneakyThrows
     public void execute(CommandSender sender, String[] args) {
         if (!permission.isEmpty() && !sender.hasPermission(permission)) {
-            sender.sendMessage(new TextComponent(ChatColor.RED + "I'm sorry, although you do not have permission to execute this command."));
+            sender.sendMessage(new TextComponent(BungeeCommandHandler.getNoPermissionMessage()));
             return;
         }
 
         if (!(sender instanceof ProxiedPlayer) && playerOnly) {
-            sender.sendMessage(new TextComponent(ChatColor.RED + "You must be a player to execute this command."));
+            sender.sendMessage(new TextComponent(BungeeCommandHandler.getPlayerOnlyMessage()));
             return;
         }
 
         if (sender instanceof ProxiedPlayer && consoleOnly) {
-            sender.sendMessage(new TextComponent(ChatColor.RED + "This command is only executable by console."));
+            sender.sendMessage(new TextComponent(BungeeCommandHandler.getConsoleOnlyMessage()));
             return;
         }
 
         int nameArgs = (names.get(0).split(" ").length - 1);
 
-        // Separate flag tokens from positional args
         Set<String> activatedFlags = new HashSet<>();
         List<String> positionalArgs = new ArrayList<>();
         for (int i = nameArgs; i < args.length; i++) {
@@ -218,7 +217,6 @@ public class BungeeCommandNode {
             return;
         }
 
-        // Build positional objects
         List<Object> positionalObjects = new ArrayList<>();
         for (int i = 0; i < positionalArgs.size(); i++) {
             if (parameters.size() < i + 1) break;
@@ -238,7 +236,6 @@ public class BungeeCommandNode {
             positionalObjects.add(object);
         }
 
-        // Fill in missing optional positional args
         for (int i = positionalObjects.size(); i < parameters.size(); i++) {
             ArgumentNode argumentNode = parameters.get(i);
             if (argumentNode.getDefaultValue() == null) {
@@ -248,7 +245,6 @@ public class BungeeCommandNode {
             }
         }
 
-        // Build final invocation list in method parameter declaration order
         List<Object> objects = new ArrayList<>();
         int positionalIndex = 0;
         for (java.lang.reflect.Parameter mp : method.getParameters()) {
@@ -276,7 +272,7 @@ public class BungeeCommandNode {
                     Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
                     log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), sender.getName(), cause);
                     sender.sendMessage(new ComponentBuilder(
-                            "An internal error occurred while executing this command.")
+                            BungeeCommandHandler.getInternalErrorMessage())
                             .color(ChatColor.RED)
                             .bold(true)
                             .create());

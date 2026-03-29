@@ -12,6 +12,7 @@ import me.marioogg.command.Subcommand;
 import me.marioogg.command.common.help.Help;
 import me.marioogg.command.common.help.HelpNode;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.bukkit.ChatColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,11 @@ public class BungeeCommandHandler {
     @Getter @Setter private static Plugin plugin;
 
     @Getter private static final Logger logger = LoggerFactory.getLogger(plugin.getDescription().getName());
+
+    @Setter @Getter private static String noPermissionMessage = ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.";
+    @Setter @Getter private static String playerOnlyMessage = ChatColor.RED + "You must be a player to execute this command.";
+    @Setter @Getter private static String consoleOnlyMessage = ChatColor.RED + "This command can only be executed by console.";
+    @Setter @Getter private static String internalErrorMessage = ChatColor.RED + "An internal error occurred while executing this command.";
 
     @SneakyThrows
     public static void registerCommands(String path, Plugin plugin) {
