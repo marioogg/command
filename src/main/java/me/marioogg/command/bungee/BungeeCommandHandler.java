@@ -19,20 +19,27 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 
 /**
- * Handles command and processor registration for Bungee.
+ * Handles command and processor registration for BungeeCord.
  */
 public class BungeeCommandHandler {
+
     @Getter @Setter private static Plugin plugin;
+    @Getter private static Logger logger;
 
-    @Getter private static final Logger logger = LoggerFactory.getLogger(plugin.getDescription().getName());
+    @Getter @Setter private static String noPermissionMessage = ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.";
+    @Getter @Setter private static String playerOnlyMessage = ChatColor.RED + "You must be a player to execute this command.";
+    @Getter @Setter private static String consoleOnlyMessage = ChatColor.RED + "This command can only be executed by console.";
+    @Getter @Setter private static String internalErrorMessage = ChatColor.RED + "An internal error occurred while executing this command.";
+    @Getter @Setter private static String cooldownMessage = ChatColor.RED + "You must wait {seconds} more second(s) before using this command again.";
 
-    @Setter @Getter private static String noPermissionMessage = ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.";
-    @Setter @Getter private static String playerOnlyMessage = ChatColor.RED + "You must be a player to execute this command.";
-    @Setter @Getter private static String consoleOnlyMessage = ChatColor.RED + "This command can only be executed by console.";
-    @Setter @Getter private static String internalErrorMessage = ChatColor.RED + "An internal error occurred while executing this command.";
+    public static void setPlugin(Plugin plugin) {
+        BungeeCommandHandler.plugin = plugin;
+        logger = LoggerFactory.getLogger(plugin.getDescription().getName());
+    }
 
     @SneakyThrows
     public static void registerCommands(String path, Plugin plugin) {
+        BungeeCommandHandler.setPlugin(plugin);
         ClassPath.from(plugin.getClass().getClassLoader()).getAllClasses().stream()
                 .filter(info -> info.getPackageName().startsWith(path))
                 .map(ClassPath.ClassInfo::load)
@@ -65,7 +72,7 @@ public class BungeeCommandHandler {
         Subcommand subcommand = commandClass.getClass().getAnnotation(Subcommand.class);
 
         Arrays.stream(commandClass.getClass().getDeclaredMethods()).forEach(method -> {
-            me.marioogg.command.Command command = method.getAnnotation(me.marioogg.command.Command.class);
+            Command command = method.getAnnotation(Command.class);
             if (command == null) return;
 
             if (subcommand != null) {
@@ -100,8 +107,11 @@ public class BungeeCommandHandler {
                 .filter(info -> info.getPackageName().startsWith(path))
                 .filter(info -> info.load().getSuperclass().equals(BungeeProcessor.class))
                 .forEach(info -> {
-                    try { BungeeParamProcessor.createProcessor((BungeeProcessor<?>) info.load().getDeclaredConstructor().newInstance());
-                    } catch (Exception e) { logger.error("Error registering command processors: ", e); }
+                    try {
+                        BungeeParamProcessor.createProcessor((BungeeProcessor<?>) info.load().getDeclaredConstructor().newInstance());
+                    } catch (Exception e) {
+                        logger.error("Error registering command processors: ", e);
+                    }
                 });
     }
 

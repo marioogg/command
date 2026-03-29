@@ -1,19 +1,20 @@
 package me.marioogg.command.bungee.node;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.marioogg.command.Command;
 import me.marioogg.command.bungee.BungeeCommandHandler;
 import me.marioogg.command.bungee.BungeeCommand;
 import me.marioogg.command.bungee.parameter.BungeeParamProcessor;
+import me.marioogg.command.bukkit.node.ArgumentNode;
+import me.marioogg.command.bukkit.parameter.Param;
+import me.marioogg.command.common.cooldown.Cooldown;
+import me.marioogg.command.common.cooldown.CooldownManager;
+import me.marioogg.command.common.cooldown.CooldownNode;
 import me.marioogg.command.common.flag.Flag;
 import me.marioogg.command.common.flag.FlagNode;
 import me.marioogg.command.common.help.HelpNode;
-import me.marioogg.command.bukkit.node.ArgumentNode;
-import me.marioogg.command.bukkit.parameter.Param;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Stores and executes Bungee command metadata.
+ * Stores and executes BungeeCord command metadata.
  */
 @Getter
 public class BungeeCommandNode {
@@ -42,6 +43,8 @@ public class BungeeCommandNode {
 
     private final Object parentClass;
     private final Method method;
+
+    private final CooldownNode cooldownNode;
 
     private final List<ArgumentNode> parameters = new ArrayList<>();
     private final List<FlagNode> flagNodes = new ArrayList<>();
@@ -72,6 +75,9 @@ public class BungeeCommandNode {
             flagNodes.add(new FlagNode(flag, parameter));
         });
 
+        Cooldown cooldown = method.getAnnotation(Cooldown.class);
+        this.cooldownNode = cooldown != null ? new CooldownNode(cooldown.seconds(), cooldown.bypassPermission()) : null;
+
         names.forEach(name -> {
             if (!BungeeCommand.getCommands().containsKey(name.split(" ")[0].toLowerCase()))
                 new BungeeCommand(name.split(" ")[0].toLowerCase());
@@ -98,9 +104,9 @@ public class BungeeCommandNode {
             if (name.equalsIgnoreCase(nameLabel.toString().trim())) {
                 int requiredParameters = (int) this.parameters.stream().filter(ArgumentNode::isRequired).count();
                 int flagCount = 0;
-                for(String arg : args) {
+                for (String arg : args) {
                     final String a = arg;
-                    if(flagNodes.stream().anyMatch(fn -> fn.matches(a))) flagCount++;
+                    if (flagNodes.stream().anyMatch(fn -> fn.matches(a))) flagCount++;
                 }
                 int actualLength = args.length - (nameLength - 1) - flagCount;
 
@@ -181,7 +187,6 @@ public class BungeeCommandNode {
         return requiredArgumentsLength;
     }
 
-    @SneakyThrows
     public void execute(CommandSender sender, String[] args) {
         if (!permission.isEmpty() && !sender.hasPermission(permission)) {
             sender.sendMessage(new TextComponent(BungeeCommandHandler.getNoPermissionMessage()));
@@ -196,6 +201,17 @@ public class BungeeCommandNode {
         if (sender instanceof ProxiedPlayer && consoleOnly) {
             sender.sendMessage(new TextComponent(BungeeCommandHandler.getConsoleOnlyMessage()));
             return;
+        }
+
+        if (cooldownNode != null && sender instanceof ProxiedPlayer player) {
+            if (cooldownNode.getBypassPermission().isEmpty() || !player.hasPermission(cooldownNode.getBypassPermission())) {
+                if (CooldownManager.isOnCooldown(player.getUniqueId(), names.get(0))) {
+                    long remaining = CooldownManager.getRemainingSeconds(player.getUniqueId(), names.get(0));
+                    sender.sendMessage(new TextComponent(BungeeCommandHandler.getCooldownMessage().replace("{seconds}", String.valueOf(remaining))));
+                    return;
+                }
+                CooldownManager.setCooldown(player.getUniqueId(), names.get(0), cooldownNode.getSeconds());
+            }
         }
 
         int nameArgs = (names.get(0).split(" ").length - 1);
@@ -227,7 +243,7 @@ public class BungeeCommandNode {
                 for (int x = i; x < positionalArgs.size(); x++) {
                     stringBuilder.append(positionalArgs.get(x)).append(" ");
                 }
-                positionalObjects.add(stringBuilder.substring(0, stringBuilder.toString().length() - 1));
+                positionalObjects.add(stringBuilder.toString().trim());
                 break;
             }
 
@@ -264,22 +280,20 @@ public class BungeeCommandNode {
         }
 
         if (async) {
-            final List<Object> asyncObjects = objects;
-            BungeeCommandHandler.getPlugin().getProxy().getScheduler().runAsync(BungeeCommandHandler.getPlugin(), () -> {
-                try {
-                    method.invoke(parentClass, asyncObjects.toArray());
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
-                    log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), sender.getName(), cause);
-                    sender.sendMessage(new ComponentBuilder(
-                            BungeeCommandHandler.getInternalErrorMessage())
-                            .color(ChatColor.RED)
-                            .bold(true)
-                            .create());
-            }});
+            BungeeCommandHandler.getPlugin().getProxy().getScheduler().runAsync(BungeeCommandHandler.getPlugin(), () -> invokeMethod(sender, objects));
             return;
         }
 
-        method.invoke(parentClass, objects.toArray());
+        invokeMethod(sender, objects);
+    }
+
+    private void invokeMethod(CommandSender sender, List<Object> params) {
+        try {
+            method.invoke(parentClass, params.toArray());
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
+            log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), sender.getName(), cause);
+            sender.sendMessage(new TextComponent(BungeeCommandHandler.getInternalErrorMessage()));
+        }
     }
 }
