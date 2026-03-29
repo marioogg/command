@@ -11,8 +11,8 @@ import me.marioogg.command.Command;
 import me.marioogg.command.Subcommand;
 import me.marioogg.command.common.help.Help;
 import me.marioogg.command.common.help.HelpNode;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.plugin.Plugin;
-import org.bukkit.ChatColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
