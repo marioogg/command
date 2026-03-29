@@ -133,4 +133,15 @@ public class BukkitCommandHandler {
             public boolean hidden() { return original.hidden(); }
         };
     }
+
+    private static boolean isInstantiable(Class<?> clazz) {
+        return !clazz.isAnonymousClass()
+                && !clazz.isLocalClass()
+                && !clazz.isInterface()
+                && !clazz.isEnum()
+                && !java.lang.reflect.Modifier.isAbstract(clazz.getModifiers())
+                && (!clazz.isMemberClass() || java.lang.reflect.Modifier.isStatic(clazz.getModifiers()))
+                && Arrays.stream(clazz.getDeclaredConstructors())
+                .anyMatch(c -> c.getParameterCount() == 0);
+    }
 }
