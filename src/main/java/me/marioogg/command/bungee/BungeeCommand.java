@@ -47,7 +47,7 @@ public class BungeeCommand extends Command implements TabExecutor {
             HelpNode helpNode = node.getHelpNodes().get(0);
 
             if (!helpNode.getPermission().isEmpty() && !sender.hasPermission(helpNode.getPermission())) {
-                sender.sendMessage(new TextComponent(ChatColor.RED + "I'm sorry, although you do not have permission to execute this command."));
+                sender.sendMessage(new TextComponent(BungeeCommandHandler.getNoPermissionMessage()));
                 return;
             }
 

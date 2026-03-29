@@ -51,7 +51,7 @@ public class BukkitCommand extends Command {
             HelpNode helpNode = node.getHelpNodes().get(0);
 
             if(!helpNode.getPermission().isEmpty() && !sender.hasPermission(helpNode.getPermission())) {
-                sender.sendMessage(ChatColor.RED + "I'm sorry, although you do not have permission to execute this command.");
+                sender.sendMessage(BukkitCommandHandler.getNoPermissionMessage());
                 return false;
             }
 
