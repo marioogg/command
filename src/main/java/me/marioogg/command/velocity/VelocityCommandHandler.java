@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-
 /**
  * Handles command and processor registration for Velocity.
  */
@@ -30,17 +29,18 @@ public class VelocityCommandHandler {
 
     private static Logger logger;
 
-    @Setter @Getter private static Component noPermissionMessage = Component.text("I'm sorry, but you do not have permission to perform this command.", NamedTextColor.RED);
-    @Setter @Getter private static Component playerOnlyMessage = Component.text("You must be a player to execute this command.", NamedTextColor.RED);
-    @Setter @Getter private static Component consoleOnlyMessage = Component.text("This command can only be executed by console.", NamedTextColor.RED);
-    @Setter @Getter private static Component internalErrorMessage = Component.text("An internal error occurred while executing this command.", NamedTextColor.RED);
-    
+    @Getter @Setter private static Component noPermissionMessage = Component.text("I'm sorry, but you do not have permission to perform this command.", NamedTextColor.RED);
+    @Getter @Setter private static Component playerOnlyMessage = Component.text("You must be a player to execute this command.", NamedTextColor.RED);
+    @Getter @Setter private static Component consoleOnlyMessage = Component.text("This command can only be executed by console.", NamedTextColor.RED);
+    @Getter @Setter private static Component internalErrorMessage = Component.text("An internal error occurred while executing this command.", NamedTextColor.RED);
+    @Getter @Setter private static Component cooldownMessage = Component.text("You must wait {seconds} more second(s) before using this command again.", NamedTextColor.RED);
+
     public static void init(Object plugin, ProxyServer proxy) {
         VelocityCommandHandler.plugin = plugin;
         VelocityCommandHandler.proxy = proxy;
         String pluginName = proxy.getPluginManager().fromInstance(plugin)
                 .map(container -> container.getDescription().getId())
-                .orElse(plugin.getClass().getSimpleName()); //backup because in some old versions it breaks
+                .orElse(plugin.getClass().getSimpleName());
         VelocityCommandHandler.logger = LoggerFactory.getLogger(pluginName);
     }
 
@@ -79,7 +79,7 @@ public class VelocityCommandHandler {
         Subcommand subcommand = commandClass.getClass().getAnnotation(Subcommand.class);
 
         Arrays.stream(commandClass.getClass().getDeclaredMethods()).forEach(method -> {
-            me.marioogg.command.Command command = method.getAnnotation(me.marioogg.command.Command.class);
+            Command command = method.getAnnotation(Command.class);
             if (command == null) return;
 
             if (subcommand != null) {
@@ -114,8 +114,11 @@ public class VelocityCommandHandler {
                 .filter(info -> info.getPackageName().startsWith(path))
                 .filter(info -> info.load().getSuperclass().equals(VelocityProcessor.class))
                 .forEach(info -> {
-                    try { VelocityParamProcessor.createProcessor((VelocityProcessor<?>) info.load().getDeclaredConstructor().newInstance());
-                    } catch (Exception e) { logger.error("Error registering command processors: ", e); }
+                    try {
+                        VelocityParamProcessor.createProcessor((VelocityProcessor<?>) info.load().getDeclaredConstructor().newInstance());
+                    } catch (Exception e) {
+                        logger.error("Error registering command processors: ", e);
+                    }
                 });
     }
 
@@ -125,6 +128,10 @@ public class VelocityCommandHandler {
 
     public static void registerProcessors(VelocityProcessor<?>... processors) {
         Arrays.stream(processors).forEach(VelocityCommandHandler::registerProcessor);
+    }
+
+    public static Logger getLogger() {
+        return logger;
     }
 
     private static Command buildDerivedCommand(Command original, String[] newNames) {
