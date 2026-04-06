@@ -1,7 +1,6 @@
 # MC Command Framework
 
 
-
 ### DISCLAIMER:
 I did not make nor helped in the initial development of this project. All the credit goes to [ashtton](https://github.com/ashtton) and his [original project](https://github.com/ashtton/spigot-command-api).
 What I'll actually do is maintain this plugin updated and according to my needs, while keeping it public, as far as providing builds on my Maven repository (check below).

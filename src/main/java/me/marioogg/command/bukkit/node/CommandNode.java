@@ -4,6 +4,9 @@ import lombok.Getter;
 import me.marioogg.command.Command;
 import me.marioogg.command.bukkit.BukkitCommandHandler;
 import me.marioogg.command.bukkit.BukkitCommand;
+import me.marioogg.command.common.cooldown.Cooldown;
+import me.marioogg.command.common.cooldown.CooldownManager;
+import me.marioogg.command.common.cooldown.CooldownNode;
 import me.marioogg.command.common.flag.Flag;
 import me.marioogg.command.common.flag.FlagNode;
 import me.marioogg.command.common.help.HelpNode;
@@ -43,6 +46,8 @@ public class CommandNode {
     private final Object parentClass;
     private final Method method;
 
+    private final CooldownNode cooldownNode;
+
     private final List<ArgumentNode> parameters = new ArrayList<>();
     private final List<FlagNode> flagNodes = new ArrayList<>();
     private final List<HelpNode> helpNodes = new ArrayList<>();
@@ -75,6 +80,9 @@ public class CommandNode {
             if(flag == null) return;
             flagNodes.add(new FlagNode(flag, parameter));
         });
+
+        Cooldown cooldown = method.getAnnotation(Cooldown.class);
+        this.cooldownNode = cooldown != null ? new CooldownNode(cooldown.seconds(), cooldown.bypassPermission()) : null;
 
         names.forEach(name -> {
             if(!BukkitCommand.getCommands().containsKey(name.split(" ")[0].toLowerCase())) new BukkitCommand(name.split(" ")[0].toLowerCase());
@@ -152,12 +160,12 @@ public class CommandNode {
 
     public void sendUsageMessage(CommandSender sender) {
         if(consoleOnly && sender instanceof Player) {
-            sender.sendMessage(ChatColor.RED + "This command can only be executed by console.");
+            sender.sendMessage(BukkitCommandHandler.getConsoleOnlyMessage());
             return;
         }
 
         if(playerOnly && sender instanceof ConsoleCommandSender) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to execute this command.");
+            sender.sendMessage(BukkitCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
@@ -167,7 +175,7 @@ public class CommandNode {
         }
 
         if(!permission.isEmpty() && !sender.hasPermission(permission)) {
-            sender.sendMessage(ChatColor.RED + "I'm sorry, you do not have permission to execute this command.");
+            sender.sendMessage(BukkitCommandHandler.getNoPermissionMessage());
             return;
         }
 
@@ -194,18 +202,29 @@ public class CommandNode {
 
     public void execute(CommandSender sender, String[] args) {
         if(!permission.isEmpty() && !sender.hasPermission(permission)) {
-            sender.sendMessage(ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.");
+            sender.sendMessage(BukkitCommandHandler.getNoPermissionMessage());
             return;
         }
 
         if(sender instanceof ConsoleCommandSender && playerOnly) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to execute this command.");
+            sender.sendMessage(BukkitCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
         if(sender instanceof Player && consoleOnly) {
-            sender.sendMessage(ChatColor.RED + "This command is only executable by console.");
+            sender.sendMessage(BukkitCommandHandler.getConsoleOnlyMessage());
             return;
+        }
+
+        if (cooldownNode != null && sender instanceof Player player) {
+            if (cooldownNode.getBypassPermission().isEmpty() || !player.hasPermission(cooldownNode.getBypassPermission())) {
+                if (CooldownManager.isOnCooldown(player.getUniqueId(), names.get(0))) {
+                    long remaining = CooldownManager.getRemainingSeconds(player.getUniqueId(), names.get(0));
+                    sender.sendMessage(BukkitCommandHandler.getCooldownMessage().replace("{seconds}", String.valueOf(remaining)));
+                    return;
+                }
+                CooldownManager.setCooldown(player.getUniqueId(), names.get(0), cooldownNode.getSeconds());
+            }
         }
 
         int nameArgs = (names.get(0).split(" ").length - 1);
@@ -286,7 +305,7 @@ public class CommandNode {
         } catch (IllegalAccessException | InvocationTargetException e) {
             Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
             log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), sender.getName(), cause);
-            sender.sendMessage(ChatColor.RED + "An internal error occurred while executing this command.");
+            sender.sendMessage(BukkitCommandHandler.getInternalErrorMessage());
         }
     }
 }

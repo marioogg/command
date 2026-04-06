@@ -2,6 +2,7 @@ package me.marioogg.command.bukkit;
 
 import com.google.common.reflect.ClassPath;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import me.marioogg.command.Command;
 import me.marioogg.command.Subcommand;
@@ -10,6 +11,7 @@ import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.bukkit.node.CommandNode;
 import me.marioogg.command.bukkit.parameter.ParamProcessor;
 import me.marioogg.command.bukkit.parameter.Processor;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,16 @@ public class BukkitCommandHandler {
     private static Plugin plugin;
     @Getter
     private static Logger logger;
+
+    @Getter @Setter private static String noPermissionMessage = ChatColor.RED + "I'm sorry, but you do not have permission to perform this command.";
+    @Getter @Setter private static String playerOnlyMessage = ChatColor.RED + "You must be a player to execute this command.";
+    @Getter @Setter private static String consoleOnlyMessage = ChatColor.RED + "This command can only be executed by console.";
+    @Getter @Setter private static String internalErrorMessage = ChatColor.RED + "An internal error occurred while executing this command.";
+    @Getter @Setter private static String cooldownMessage = ChatColor.RED + "You must wait {seconds} more second(s) before using this command again.";
+    @Getter @Setter private static String minValidationMessage = ChatColor.RED + "The value must be at least {min}.";
+    @Getter @Setter private static String maxValidationMessage = ChatColor.RED + "The value must be at most {max}.";
+    @Getter @Setter private static String matchesValidationMessage = ChatColor.RED + "Invalid format.";
+
 
     public static void setPlugin(Plugin plugin) {
         BukkitCommandHandler.plugin = plugin;

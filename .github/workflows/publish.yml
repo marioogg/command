@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - ver/2.0
 
 jobs:
   publish:

@@ -2,7 +2,10 @@ package me.marioogg.command.bungee.parameter;
 
 import lombok.Data;
 import lombok.Getter;
+import me.marioogg.command.bukkit.BukkitCommandHandler;
 import me.marioogg.command.bukkit.node.ArgumentNode;
+import me.marioogg.command.bungee.BungeeCommandHandler;
+import me.marioogg.command.common.validation.*;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -28,7 +31,21 @@ public class BungeeParamProcessor {
         BungeeProcessor<?> processor = processors.get(node.getParameter().getType());
         if (processor == null) return supplied;
 
-        return processor.process(sender, supplied);
+        Object result = processor.process(sender, supplied);
+        if (result == null) return null;
+
+        ValidationResult validation = Validator.validate(node.getParameter(), result);
+        if (!validation.isValid()) {
+            if (validation instanceof Min) {
+                sender.sendMessage(BungeeCommandHandler.getMinValidationMessage().replace("{min}", String.valueOf(((Min) validation).value())));
+            } else if (validation instanceof Max) {
+                sender.sendMessage(BungeeCommandHandler.getMaxValidationMessage().replace("{max}", String.valueOf(((Max) validation).value())));
+            } else if (validation instanceof Matches) {
+                sender.sendMessage(BungeeCommandHandler.getMatchesValidationMessage());
+            }
+            return null;
+        }
+        return result;
     }
 
     public List<String> getTabComplete() {

@@ -1,13 +1,15 @@
 package me.marioogg.command.velocity.node;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.marioogg.command.Command;
+import me.marioogg.command.bukkit.node.ArgumentNode;
+import me.marioogg.command.bukkit.parameter.Param;
+import me.marioogg.command.common.cooldown.Cooldown;
+import me.marioogg.command.common.cooldown.CooldownManager;
+import me.marioogg.command.common.cooldown.CooldownNode;
 import me.marioogg.command.common.flag.Flag;
 import me.marioogg.command.common.flag.FlagNode;
 import me.marioogg.command.common.help.HelpNode;
-import me.marioogg.command.bukkit.node.ArgumentNode;
-import me.marioogg.command.bukkit.parameter.Param;
 import me.marioogg.command.velocity.VelocityCommandHandler;
 import me.marioogg.command.velocity.command.VelocityRawCommand;
 import me.marioogg.command.velocity.parameter.VelocityParamProcessor;
@@ -15,7 +17,9 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.slf4j.Logger;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,8 +28,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Stores and executes Velocity command metadata.
  */
 @Getter
-public class VelocityCommandNode{
+public class VelocityCommandNode {
     @Getter private static final List<VelocityCommandNode> nodes = new ArrayList<>();
+
+    private static final Logger log = VelocityCommandHandler.getLogger();
 
     private final ArrayList<String> names = new ArrayList<>();
     private final String permission;
@@ -37,6 +43,8 @@ public class VelocityCommandNode{
 
     private final Object parentClass;
     private final Method method;
+
+    private final CooldownNode cooldownNode;
 
     private final List<ArgumentNode> parameters = new ArrayList<>();
     private final List<FlagNode> flagNodes = new ArrayList<>();
@@ -67,6 +75,9 @@ public class VelocityCommandNode{
             flagNodes.add(new FlagNode(flag, parameter));
         });
 
+        Cooldown cooldown = method.getAnnotation(Cooldown.class);
+        this.cooldownNode = cooldown != null ? new CooldownNode(cooldown.seconds(), cooldown.bypassPermission()) : null;
+
         names.forEach(name -> {
             if (!VelocityRawCommand.getCommands().containsKey(name.split(" ")[0].toLowerCase()))
                 new VelocityRawCommand(name.split(" ")[0].toLowerCase());
@@ -93,9 +104,9 @@ public class VelocityCommandNode{
             if (name.equalsIgnoreCase(nameLabel.toString().trim())) {
                 int requiredParameters = (int) this.parameters.stream().filter(ArgumentNode::isRequired).count();
                 int flagCount = 0;
-                for(String arg : args) {
+                for (String arg : args) {
                     final String a = arg;
-                    if(flagNodes.stream().anyMatch(fn -> fn.matches(a))) flagCount++;
+                    if (flagNodes.stream().anyMatch(fn -> fn.matches(a))) flagCount++;
                 }
                 int actualLength = args.length - (nameLength - 1) - flagCount;
 
@@ -141,17 +152,17 @@ public class VelocityCommandNode{
 
     public void sendUsageMessage(CommandSource source) {
         if (consoleOnly && source instanceof Player) {
-            source.sendMessage(Component.text("This command can only be executed by console.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getConsoleOnlyMessage());
             return;
         }
 
         if (playerOnly && !(source instanceof Player)) {
-            source.sendMessage(Component.text("You must be a player to execute this command.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
         if (!permission.isEmpty() && !source.hasPermission(permission)) {
-            source.sendMessage(Component.text("I'm sorry, you do not have permission to execute this command.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getNoPermissionMessage());
             return;
         }
 
@@ -176,26 +187,36 @@ public class VelocityCommandNode{
         return requiredArgumentsLength;
     }
 
-    @SneakyThrows
     public void execute(CommandSource source, String[] args) {
         if (!permission.isEmpty() && !source.hasPermission(permission)) {
-            source.sendMessage(Component.text("I'm sorry, although you do not have permission to execute this command.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getNoPermissionMessage());
             return;
         }
 
         if (!(source instanceof Player) && playerOnly) {
-            source.sendMessage(Component.text("You must be a player to execute this command.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getPlayerOnlyMessage());
             return;
         }
 
         if (source instanceof Player && consoleOnly) {
-            source.sendMessage(Component.text("This command is only executable by console.", NamedTextColor.RED));
+            source.sendMessage(VelocityCommandHandler.getConsoleOnlyMessage());
             return;
+        }
+
+        if (cooldownNode != null && source instanceof Player player) {
+            if (cooldownNode.getBypassPermission().isEmpty() || !player.hasPermission(cooldownNode.getBypassPermission())) {
+                if (CooldownManager.isOnCooldown(player.getUniqueId(), names.get(0))) {
+                    long remaining = CooldownManager.getRemainingSeconds(player.getUniqueId(), names.get(0));
+                    source.sendMessage(VelocityCommandHandler.getCooldownMessage()
+                            .replaceText(config -> config.matchLiteral("{seconds}").replacement(String.valueOf(remaining))));
+                    return;
+                }
+                CooldownManager.setCooldown(player.getUniqueId(), names.get(0), cooldownNode.getSeconds());
+            }
         }
 
         int nameArgs = (names.get(0).split(" ").length - 1);
 
-        // Separate flag tokens from positional args
         Set<String> activatedFlags = new HashSet<>();
         List<String> positionalArgs = new ArrayList<>();
         for (int i = nameArgs; i < args.length; i++) {
@@ -213,7 +234,6 @@ public class VelocityCommandNode{
             return;
         }
 
-        // Build positional objects
         List<Object> positionalObjects = new ArrayList<>();
         for (int i = 0; i < positionalArgs.size(); i++) {
             if (parameters.size() < i + 1) break;
@@ -224,7 +244,7 @@ public class VelocityCommandNode{
                 for (int x = i; x < positionalArgs.size(); x++) {
                     stringBuilder.append(positionalArgs.get(x)).append(" ");
                 }
-                positionalObjects.add(stringBuilder.substring(0, stringBuilder.toString().length() - 1));
+                positionalObjects.add(stringBuilder.toString().trim());
                 break;
             }
 
@@ -233,7 +253,6 @@ public class VelocityCommandNode{
             positionalObjects.add(object);
         }
 
-        // Fill in missing optional positional args
         for (int i = positionalObjects.size(); i < parameters.size(); i++) {
             ArgumentNode argumentNode = parameters.get(i);
             if (argumentNode.getDefaultValue() == null) {
@@ -243,7 +262,6 @@ public class VelocityCommandNode{
             }
         }
 
-        // Build final invocation list in method parameter declaration order
         List<Object> objects = new ArrayList<>();
         int positionalIndex = 0;
         for (java.lang.reflect.Parameter mp : method.getParameters()) {
@@ -263,14 +281,22 @@ public class VelocityCommandNode{
         }
 
         if (async) {
-            final List<Object> asyncObjects = objects;
             VelocityCommandHandler.getProxy().getScheduler()
-                    .buildTask(VelocityCommandHandler.getPlugin(), () -> {
-                        try { method.invoke(parentClass, asyncObjects.toArray()); } catch (Exception e) { e.printStackTrace(); }
-                    }).schedule();
+                    .buildTask(VelocityCommandHandler.getPlugin(), () -> invokeMethod(source, objects))
+                    .schedule();
             return;
         }
 
-        method.invoke(parentClass, objects.toArray());
+        invokeMethod(source, objects);
+    }
+
+    private void invokeMethod(CommandSource source, List<Object> params) {
+        try {
+            method.invoke(parentClass, params.toArray());
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            Throwable cause = (e instanceof InvocationTargetException) ? e.getCause() : e;
+            log.error("An exception occurred while executing command '{}' (Sender: {})", names.get(0), source, cause);
+            source.sendMessage(VelocityCommandHandler.getInternalErrorMessage());
+        }
     }
 }
