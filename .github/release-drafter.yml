@@ -27,5 +27,5 @@ categories:
 change-template: '- $TITLE ($CHANGESET) by @$AUTHOR'
 
 template: |
-  ## What's Changed
+  ## What's new?
   $CHANGES
