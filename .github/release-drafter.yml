@@ -1,33 +1,29 @@
 name-template: 'v$RESOLVED_VERSION 🚀'
 tag-template: 'v$RESOLVED_VERSION'
+
+version-resolver:
+  major:
+    labels: ['major']
+  minor:
+    labels: ['feat']
+  patch:
+    labels: ['fix']
+  default: patch
+
 categories:
   - title: '🚀 Features'
-    labels:
-      - 'feat'
+    labels: ['feat']
   - title: '🐛 Bug Fixes'
-    labels:
-      - 'fix'
+    labels: ['fix']
   - title: '🛠 Refactors'
-    labels:
-      - 'refactor'
+    labels: ['refactor']
   - title: '🧹 Chore & Maintenance'
-    labels:
-      - 'chore'
-      - 'build'
+    labels: ['chore', 'build']
   - title: '📝 Documentation'
-    labels:
-      - 'docs'
-  - title: '🔥 Removed'
-    labels:
-      - 'removed'
-change-template: '- $TITLE ($SHORT_SHA) by @$AUTHOR'
+    labels: ['docs']
+
+change-template: '- $TITLE ($CHANGESET) by @$AUTHOR'
+
 template: |
-  ## Changelog
+  ## What's Changed
   $CHANGES
-  
-  ---
-  Special thanks to all contributors! 🙌
-  $CONTRIBUTORS
-  
-  ---
-  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$NEXT_TAG
