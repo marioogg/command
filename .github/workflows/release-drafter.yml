@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - ver/2.0
   pull_request:
     types: [opened, reopened, synchronize]
 
