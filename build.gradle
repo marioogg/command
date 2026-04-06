@@ -22,19 +22,21 @@ publishing {
 
     repositories {
         maven {
-            def isSnapshot = version.toString().endsWith("SNAPSHOT")
-            def releasesRepoUrl = "https://maven.marioogg.dev/repository/private"
-            def snapshotsRepoUrl = "https://maven.marioogg.dev/repository/private"
+            def versionString = version.toString()
+            def isBeta = versionString.contains("-b")
+            def isSnapshot =  versionString.endsWith("SNAPSHOT")
 
-            url = uri(isSnapshot ? snapshotsRepoUrl : releasesRepoUrl)
+            def privateRepo = "https://maven.marioogg.dev/repository/private"
+            def snapshotRepo = "https://maven.marioogg.dev/repository/snapshots"
+            def releaseRepoUrl = "https://maven.marioogg.dev/repository/releases"
+
+            url = uri(isBeta ? privateRepo : isSnapshot ? snapshotRepo : releaseRepoUrl)
 
             credentials {
                 username = System.getenv("MAVEN_USERNAME")
                 password = System.getenv("MAVEN_PASSWORD")
             }
         }
-    }
-}
 
 dependencies {
     compileOnly('org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT') {
