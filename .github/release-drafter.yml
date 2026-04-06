@@ -1,0 +1,33 @@
+name-template: 'v$RESOLVED_VERSION 🚀'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'feat'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+  - title: '🛠 Refactors'
+    labels:
+      - 'refactor'
+  - title: '🧹 Chore & Maintenance'
+    labels:
+      - 'chore'
+      - 'build'
+  - title: '📝 Documentation'
+    labels:
+      - 'docs'
+  - title: '🔥 Removed'
+    labels:
+      - 'removed'
+change-template: '- $TITLE ($SHORT_SHA) by @$AUTHOR'
+template: |
+  ## Changelog
+  $CHANGES
+  
+  ---
+  Special thanks to all contributors! 🙌
+  $CONTRIBUTORS
+  
+  ---
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$NEXT_TAG
