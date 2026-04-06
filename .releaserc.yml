@@ -1,20 +1,24 @@
-branches: ["master"]
+branches:
+  - "master"
+
 plugins:
   - "@semantic-release/commit-analyzer"
   - - "@semantic-release/release-notes-generator"
     - preset: "conventionalcommits"
-      writerOpts:
-        transform:
-          feat:
+      presetConfig:
+        types:
+          - type: "feat"
             section: "🚀 Features"
-          fix:
+          - type: "fix"
             section: "🐛 Bug Fixes"
-          chore:
+          - type: "chore"
             section: "🧰 Maintenance"
-          refactor:
+          - type: "refactor"
             section: "🛠 Refactors"
-          docs:
+          - type: "docs"
             section: "📝 Documentation"
-          perf:
+          - type: "perf"
             section: "⚡ Performance"
+          - type: "removed"
+            section: "🔥 Removed"
   - "@semantic-release/github"
