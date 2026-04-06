@@ -24,7 +24,7 @@ publishing {
         maven {
             def versionString = version.toString()
             def isBeta = versionString.contains("-b")
-            def isSnapshot =  versionString.endsWith("SNAPSHOT")
+            def isSnapshot = versionString.endsWith("SNAPSHOT")
 
             def privateRepo = "https://maven.marioogg.dev/repository/private"
             def snapshotRepo = "https://maven.marioogg.dev/repository/snapshots"
@@ -37,7 +37,8 @@ publishing {
                 password = System.getenv("MAVEN_PASSWORD")
             }
         }
-
+    }
+}
 dependencies {
     compileOnly('org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT') {
         exclude group: 'net.md-5'
