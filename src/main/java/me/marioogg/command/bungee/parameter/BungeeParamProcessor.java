@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import me.marioogg.command.bukkit.BukkitCommandHandler;
 import me.marioogg.command.bukkit.node.ArgumentNode;
+import me.marioogg.command.bungee.BungeeCommandHandler;
 import me.marioogg.command.common.validation.*;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -36,11 +37,11 @@ public class BungeeParamProcessor {
         ValidationResult validation = Validator.validate(node.getParameter(), result);
         if (!validation.isValid()) {
             if (validation instanceof Min) {
-                sender.sendMessage(BukkitCommandHandler.getMinValidationMessage().replace("{min}", String.valueOf(((Min) validation).value())));
+                sender.sendMessage(BungeeCommandHandler.getMinValidationMessage().replace("{min}", String.valueOf(((Min) validation).value())));
             } else if (validation instanceof Max) {
-                sender.sendMessage(BukkitCommandHandler.getMinValidationMessage().replace("{max}", String.valueOf(((Max) validation).value())));
+                sender.sendMessage(BungeeCommandHandler.getMinValidationMessage().replace("{max}", String.valueOf(((Max) validation).value())));
             } else if (validation instanceof Matches) {
-                sender.sendMessage(BukkitCommandHandler.getMatchesValidationMessage());
+                sender.sendMessage(BungeeCommandHandler.getMatchesValidationMessage());
             }
             return null;
         }
