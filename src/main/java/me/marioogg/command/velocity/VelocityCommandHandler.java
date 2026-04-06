@@ -34,6 +34,9 @@ public class VelocityCommandHandler {
     @Getter @Setter private static Component consoleOnlyMessage = Component.text("This command can only be executed by console.", NamedTextColor.RED);
     @Getter @Setter private static Component internalErrorMessage = Component.text("An internal error occurred while executing this command.", NamedTextColor.RED);
     @Getter @Setter private static Component cooldownMessage = Component.text("You must wait {seconds} more second(s) before using this command again.", NamedTextColor.RED);
+    @Getter @Setter private static Component minValidationMessage = Component.text("The value must be at least {min}.", NamedTextColor.RED);
+    @Getter @Setter private static Component maxValidationMessage = Component.text("The value must be at most {max}.", NamedTextColor.RED);
+    @Getter @Setter private static Component matchesValidationMessage = Component.text("Invalid format.", NamedTextColor.RED);
 
     public static void init(Object plugin, ProxyServer proxy) {
         VelocityCommandHandler.plugin = plugin;

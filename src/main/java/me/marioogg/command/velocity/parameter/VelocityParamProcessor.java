@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.Getter;
 import me.marioogg.command.bukkit.node.ArgumentNode;
 import com.velocitypowered.api.command.CommandSource;
+import me.marioogg.command.common.validation.*;
+import me.marioogg.command.velocity.VelocityCommandHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -27,7 +29,29 @@ public class VelocityParamProcessor {
         if (!loaded) loadProcessors();
         VelocityProcessor<?> processor = processors.get(node.getParameter().getType());
         if (processor == null) return supplied;
-        return processor.process(source, supplied);
+        Object result = processor.process(source, supplied);
+        if (result == null) return null;
+
+        ValidationResult validation = Validator.validate(node.getParameter(), result);
+        if (!validation.isValid()) {
+            if (validation instanceof Min) {
+                source.sendMessage(replacePlaceholder(
+                        VelocityCommandHandler.getMinValidationMessage(),
+                        "{min}",
+                        ((Min) validation).value()
+                ));
+            } else if (validation instanceof Max) {
+                source.sendMessage(replacePlaceholder(
+                        VelocityCommandHandler.getMaxValidationMessage(),
+                        "{max}",
+                        ((Max) validation).value()
+                ));
+            } else if (validation instanceof Matches) {
+                source.sendMessage(VelocityCommandHandler.getMatchesValidationMessage());
+            }
+            return null;
+        }
+        return result;
     }
 
     public List<String> getTabComplete() {
@@ -39,6 +63,12 @@ public class VelocityParamProcessor {
 
     public static void createProcessor(VelocityProcessor<?> processor) {
         processors.put(processor.getType(), processor);
+    }
+
+    private static Component replacePlaceholder(Component template, String placeholder, Object value) {
+        return template.replaceText(config -> config
+                .matchLiteral(placeholder)
+                .replacement(String.valueOf(value)));
     }
 
     public static void loadProcessors() {
