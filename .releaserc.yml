@@ -26,3 +26,5 @@ plugins:
       failComment: false
       releasedLabels: false
       draft: true
+      prerelease: false
+      addReleases: "top"
