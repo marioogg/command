@@ -21,4 +21,8 @@ plugins:
             section: "⚡ Performance"
           - type: "removed"
             section: "🔥 Removed"
-  - "@semantic-release/github"
+  - - "@semantic-release/github"
+    - successComment: false
+      failComment: false
+      releasedLabels: false
+      draft: true
