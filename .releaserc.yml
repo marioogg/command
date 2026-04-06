@@ -1,0 +1,20 @@
+branches: ["main"]
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - - "@semantic-release/release-notes-generator"
+    - preset: "conventionalcommits"
+      writerOpts:
+        transform:
+          feat:
+            section: "🚀 Features"
+          fix:
+            section: "🐛 Bug Fixes"
+          chore:
+            section: "🧰 Maintenance"
+          refactor:
+            section: "🛠 Refactors"
+          docs:
+            section: "📝 Documentation"
+          perf:
+            section: "⚡ Performance"
+  - "@semantic-release/github"
