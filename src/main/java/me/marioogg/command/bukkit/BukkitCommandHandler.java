@@ -33,6 +33,10 @@ public class BukkitCommandHandler {
     @Getter @Setter private static String consoleOnlyMessage = ChatColor.RED + "This command can only be executed by console.";
     @Getter @Setter private static String internalErrorMessage = ChatColor.RED + "An internal error occurred while executing this command.";
     @Getter @Setter private static String cooldownMessage = ChatColor.RED + "You must wait {seconds} more second(s) before using this command again.";
+    @Getter @Setter private static String minValidationMessage = ChatColor.RED + "The value must be at least {min}.";
+    @Getter @Setter private static String maxValidationMessage = ChatColor.RED + "The value must be at most {max}.";
+    @Getter @Setter private static String matchesValidationMessage = ChatColor.RED + "Invalid format.";
+
 
     public static void setPlugin(Plugin plugin) {
         BukkitCommandHandler.plugin = plugin;
