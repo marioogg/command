@@ -51,7 +51,7 @@ public class ParamProcessor {
             if (validation instanceof Min) {
                 sender.sendMessage(BukkitCommandHandler.getMinValidationMessage().replace("{min}", String.valueOf(((Min) validation).value())));
             } else if (validation instanceof Max) {
-                sender.sendMessage(BukkitCommandHandler.getMinValidationMessage().replace("{max}", String.valueOf(((Max) validation).value())));
+                sender.sendMessage(BukkitCommandHandler.getMaxValidationMessage().replace("{max}", String.valueOf(((Max) validation).value())));
             } else if (validation instanceof Matches) {
                 sender.sendMessage(BukkitCommandHandler.getMatchesValidationMessage());
             }
