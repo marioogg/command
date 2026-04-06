@@ -21,6 +21,8 @@ categories:
     labels: ['chore', 'build']
   - title: '📝 Documentation'
     labels: ['docs']
+  - title: '🔥 Removed'
+    labels: ['removed']
 
 change-template: '- $TITLE ($CHANGESET) by @$AUTHOR'
 
