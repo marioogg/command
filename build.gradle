@@ -1,68 +1,75 @@
 plugins {
-    id 'java'
-    id 'io.freefair.lombok' version '8.13.1'
-    id 'maven-publish'
-    id 'com.gradleup.shadow' version '8.3.3'
+    id 'base'
 }
 
-group 'me.marioogg'
-version '2.0-b2'
+group = 'me.marioogg'
+version = '2.0-b2'
 
-repositories {
-    maven { url 'https://maven.marioogg.dev/repository/public/' }
-    maven { url 'https://repo.papermc.io/repository/maven-public/' }
-}
+def versionString = version.toString()
+def isBeta = versionString.contains('-b')
+def isSnapshot = versionString.endsWith('SNAPSHOT')
 
-publishing {
-    publications {
-        shadow(MavenPublication) {
-            artifact(tasks.shadowJar)
-        }
-    }
+def publishTarget = isBeta
+        ? 'https://maven.marioogg.dev/repository/private'
+        : isSnapshot
+            ? 'https://maven.marioogg.dev/repository/snapshots'
+            : 'https://maven.marioogg.dev/repository/releases'
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+
+    group = rootProject.group
+    version = rootProject.version
 
     repositories {
-        maven {
-            def versionString = version.toString()
-            def isBeta = versionString.contains("-b")
-            def isSnapshot = versionString.endsWith("SNAPSHOT")
+        mavenCentral()
+        maven { url 'https://maven.marioogg.dev/repository/public/' }
+        maven { url 'https://repo.papermc.io/repository/maven-public/' }
+        maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    }
 
-            def privateRepo = "https://maven.marioogg.dev/repository/private"
-            def snapshotRepo = "https://maven.marioogg.dev/repository/snapshots"
-            def releaseRepoUrl = "https://maven.marioogg.dev/repository/releases"
+    dependencies {
+        compileOnly 'org.projectlombok:lombok:1.18.36'
+        annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
-            url = uri(isBeta ? privateRepo : isSnapshot ? snapshotRepo : releaseRepoUrl)
+        testImplementation platform('org.junit:junit-bom:5.10.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
 
-            credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+
+        repositories {
+            maven {
+                url = uri(publishTarget)
+                credentials {
+                    username = System.getenv('MAVEN_USERNAME')
+                    password = System.getenv('MAVEN_PASSWORD')
+                }
             }
         }
     }
-}
-dependencies {
-    compileOnly('org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT') {
-        exclude group: 'net.md-5'
-    }
-    compileOnly('org.spigotmc:spigot:1.8.8-R0.1-SNAPSHOT')
-    compileOnly('dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT') {
-        exclude group: 'net.md-5'
-    }
-    compileOnly 'net.md-5:bungeecord-api:1.20-R0.2-SNAPSHOT'
-    compileOnly 'com.velocitypowered:velocity-api:3.3.0-SNAPSHOT'
-    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.25.3'
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
-
-tasks.shadowJar {
-    archiveClassifier.set('')
 }

@@ -25,3 +25,15 @@ To keep my Java packages ordered, I'll probably rename the packages to `me.mario
 * **Misc:** Boolean
 You can also register custom processors for any type — see the processor examples [in the wiki.](https://github.com/marioogg/command/wiki)
 ---
+
+### Multi-module layout
+
+This project is split into platform modules:
+
+- `common`: shared annotations and core command metadata
+- `bukkit`: Bukkit/Spigot implementation
+- `bungee`: BungeeCord implementation
+- `velocity`: Velocity implementation
+
+Use the module that matches your platform, and add `common` only if you need direct access to shared types.
+
