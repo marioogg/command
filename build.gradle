@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'me.marioogg'
-version = '2.0-b2'
+version = '2.0.1'
 
 def versionString = version.toString()
 def isBeta = versionString.contains('-b')
