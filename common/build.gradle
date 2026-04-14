@@ -1,7 +1,2 @@
 dependencies {
-    def log4jVersion = '2.25.4'
-
-    api "org.apache.logging.log4j:log4j-api:${log4jVersion}"
-    runtimeOnly "org.apache.logging.log4j:log4j-core:${log4jVersion}"
-    api "com.google.guava:guava:33.5.0-jre"
 }

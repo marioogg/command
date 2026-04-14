@@ -75,7 +75,7 @@ public class BukkitCommandHandler {
         }
     }
 
-    public static void registerCommands(Object commandClass) {
+    private static void registerCommands(Object commandClass) {
         Subcommand subcommand = commandClass.getClass().getAnnotation(Subcommand.class);
 
         Arrays.stream(commandClass.getClass().getDeclaredMethods()).forEach(method -> {
