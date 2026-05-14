@@ -2,8 +2,8 @@ plugins {
     id 'base'
 }
 
-group = 'me.marioogg'
-version = '2.0.1'
+group = 'me.marioogg.command'
+version = '2.0.2'
 
 def versionString = version.toString()
 def isBeta = versionString.contains('-b')
@@ -25,12 +25,15 @@ subprojects {
     repositories {
         mavenCentral()
         maven { url 'https://maven.marioogg.dev/repository/public/' }
-        maven { url 'https://repo.papermc.io/repository/maven-public/' }
-        maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     }
 
     dependencies {
+        if (project.name != 'common') {
+            api project(':common')
+        }
+
+        implementation("org.apache.logging.log4j:log4j-core:3.0.0-beta3")
+        api "com.google.guava:guava:33.5.0-jre"
         compileOnly 'org.projectlombok:lombok:1.18.36'
         annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
@@ -59,6 +62,7 @@ subprojects {
         publications {
             mavenJava(MavenPublication) {
                 from components.java
+                artifactId = "${rootProject.name}-${project.name}"
             }
         }
 
