@@ -13,6 +13,7 @@ import me.marioogg.command.common.flag.FlagNode;
 import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.common.node.ArgumentNode;
 import me.marioogg.command.common.parameter.Param;
+import me.marioogg.command.common.parameter.ParamNodeParser;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -64,11 +65,8 @@ public class BungeeCommandNode {
         this.parentClass = parentClass;
         this.method = method;
 
-        Arrays.stream(method.getParameters()).forEach(parameter -> {
-            Param param = parameter.getAnnotation(Param.class);
-            if (param == null) return;
-            parameters.add(new ArgumentNode(param.name(), param.concated(), param.required(), param.defaultValue().isEmpty() ? null : param.defaultValue(), parameter));
-        });
+        // Parse parameters using centralized parser
+        parameters.addAll(ParamNodeParser.parseParameters(method));
 
         Arrays.stream(method.getParameters()).forEach(parameter -> {
             Flag flag = parameter.getAnnotation(Flag.class);

@@ -6,6 +6,7 @@ import me.marioogg.command.bukkit.BukkitCommand;
 import me.marioogg.command.common.Command;
 import me.marioogg.command.common.node.ArgumentNode;
 import me.marioogg.command.common.parameter.Param;
+import me.marioogg.command.common.parameter.ParamNodeParser;
 import me.marioogg.command.common.cooldown.Cooldown;
 import me.marioogg.command.common.cooldown.CooldownManager;
 import me.marioogg.command.common.cooldown.CooldownNode;
@@ -70,12 +71,8 @@ public class CommandNode {
         this.parentClass = parentClass;
         this.method = method;
 
-        Arrays.stream(method.getParameters()).forEach(parameter -> {
-            Param param = parameter.getAnnotation(Param.class);
-            if(param == null) return;
-
-            parameters.add(new ArgumentNode(param.name(), param.concated(), param.required(), param.defaultValue().isEmpty() ? null : param.defaultValue(), parameter));
-        });
+        // Parse parameters using centralized parser
+        parameters.addAll(ParamNodeParser.parseParameters(method));
 
         Arrays.stream(method.getParameters()).forEach(parameter -> {
             Flag flag = parameter.getAnnotation(Flag.class);

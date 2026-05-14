@@ -12,6 +12,7 @@ public class ArgumentNode {
     private final String name;
     private final boolean concated;
     private final boolean required;
+    private final boolean optional;
     private final String defaultValue;
     private final Parameter parameter;
 }
