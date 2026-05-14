@@ -2,8 +2,8 @@ plugins {
     id 'base'
 }
 
-group = 'me.marioogg'
-version = '2.0.1'
+group = 'me.marioogg.command'
+version = '2.0.2'
 
 def versionString = version.toString()
 def isBeta = versionString.contains('-b')

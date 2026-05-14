@@ -7,6 +7,9 @@ public class Validator {
         Min min = parameter.getAnnotation(Min.class);
         Max max = parameter.getAnnotation(Max.class);
         Matches matches = parameter.getAnnotation(Matches.class);
+        Range range = parameter.getAnnotation(Range.class);
+        Length length = parameter.getAnnotation(Length.class);
+        Confirm confirm = parameter.getAnnotation(Confirm.class);
 
         if (min != null && value instanceof Number n && n.longValue() < min.value())
             return ValidationResult.fail("min");
@@ -14,7 +17,13 @@ public class Validator {
             return ValidationResult.fail("max");
         if (matches != null && value instanceof String s && !s.matches(matches.value()))
             return ValidationResult.fail("matches");
-
+        if (range != null && value instanceof Number n && (n.doubleValue() < range.min() || n.doubleValue() > range.max()))
+            return ValidationResult.fail("range");
+        if (length != null && value instanceof String s &&
+                (s.length() < length.min() || s.length() > length.max()))
+            return ValidationResult.fail("length");
+        if (confirm != null){// logic
+            }
         return ValidationResult.OK;
     }
 }
