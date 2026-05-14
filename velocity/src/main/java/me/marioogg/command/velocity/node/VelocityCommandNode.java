@@ -10,6 +10,7 @@ import me.marioogg.command.common.flag.FlagNode;
 import me.marioogg.command.common.help.HelpNode;
 import me.marioogg.command.common.node.ArgumentNode;
 import me.marioogg.command.common.parameter.Param;
+import me.marioogg.command.common.parameter.ParamNodeParser;
 import me.marioogg.command.velocity.VelocityCommandHandler;
 import me.marioogg.command.velocity.command.VelocityRawCommand;
 import me.marioogg.command.velocity.parameter.VelocityParamProcessor;
@@ -63,11 +64,8 @@ public class VelocityCommandNode {
         this.parentClass = parentClass;
         this.method = method;
 
-        Arrays.stream(method.getParameters()).forEach(parameter -> {
-            Param param = parameter.getAnnotation(Param.class);
-            if (param == null) return;
-            parameters.add(new ArgumentNode(param.name(), param.concated(), param.required(), param.defaultValue().isEmpty() ? null : param.defaultValue(), parameter));
-        });
+        // Parse parameters using centralized parser
+        parameters.addAll(ParamNodeParser.parseParameters(method));
 
         Arrays.stream(method.getParameters()).forEach(parameter -> {
             Flag flag = parameter.getAnnotation(Flag.class);

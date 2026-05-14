@@ -28,6 +28,12 @@ public @interface Param {
     boolean required() default true;
 
     /**
+     * Marks the parameter as optional. If true, the parameter can be omitted
+     * and will use the defaultValue if not provided.
+     */
+    boolean optional() default false;
+
+    /**
      * Used as the default value if required is false and no parameter parse is provided.
      */
     String defaultValue() default "";
